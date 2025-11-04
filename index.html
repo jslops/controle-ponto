@@ -477,7 +477,7 @@
                         <i class="fas fa-clock text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Horas Este Mês</p>
+                        <p class="text-sm text-gray-600">Horas Este Período</p>
                         <p class="text-2xl font-bold text-gray-800" id="dashboardHorasMes">00:00</p>
                     </div>
                 </div>
@@ -489,7 +489,7 @@
                         <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Salário Este Mês</p>
+                        <p class="text-sm text-gray-600">Salário Este Período</p>
                         <p class="text-2xl font-bold text-gray-800" id="dashboardSalarioMes">R$ 0,00</p>
                     </div>
                 </div>
@@ -546,7 +546,7 @@
                         </div>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-4">
-                        <h3 class="font-medium text-blue-800 mb-2">Status do Mês</h3>
+                        <h3 class="font-medium text-blue-800 mb-2">Status do Período</h3>
                         <div class="flex justify-between">
                             <span>Horas Trabalhadas:</span>
                             <span id="horasTrabalhadasMensal">00:00</span>
@@ -564,30 +564,44 @@
             </div>
         </div>
 
-        <!-- Abas dos meses -->
+        <!-- Período de Cálculo -->
         <div class="mb-6 no-print">
-            <div class="flex flex-wrap gap-2">
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="0">Jan</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="1">Fev</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="2">Mar</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="3">Abr</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="4">Mai</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="5">Jun</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="6">Jul</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="7">Ago</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="8">Set</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="9">Out</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="10">Nov</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="11">Dez</button>
+            <div class="modern-card">
+                <h2 class="text-xl font-bold mb-4">📅 Período de Cálculo</h2>
+                
+                <div class="mb-4">
+                    <label class="flex items-center mb-2">
+                        <input type="radio" name="periodType" value="standard" class="mr-2" checked>
+                        <span>Período Padrão (16/Mês Atual - 15/Próximo Mês)</span>
+                    </label>
+                    <label class="flex items-center">
+                        <input type="radio" name="periodType" value="custom" class="mr-2">
+                        <span>Período Personalizado</span>
+                    </label>
+                </div>
+                
+                <div id="customPeriodConfig" class="hidden">
+                    <div class="grid grid-cols-2 gap-4 mb-4">
+                        <div>
+                            <label for="periodStartDay" class="block text-sm font-medium text-gray-700 mb-1">
+                                Dia de Início do Período:
+                            </label>
+                            <input type="number" id="periodStartDay" class="modern-input" min="1" max="31" value="16">
+                        </div>
+                        <div>
+                            <label for="periodEndDay" class="block text-sm font-medium text-gray-700 mb-1">
+                                Dia de Término (automático):
+                            </label>
+                            <input type="number" id="periodEndDay" class="modern-input" disabled value="15">
+                        </div>
+                    </div>
+                </div>
+                
+                <div class="bg-blue-50 rounded-lg p-4">
+                    <h3 class="font-medium text-blue-800 mb-2">Período Atual de Cálculo:</h3>
+                    <p id="currentPeriodDisplay" class="text-blue-700"></p>
+                </div>
             </div>
-        </div>
-
-        <!-- Ano selecionado -->
-        <div class="mb-6 no-print">
-            <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Ano:</label>
-            <select id="yearSelect" class="modern-input w-32">
-                <!-- Opções de ano serão preenchidas via JavaScript -->
-            </select>
         </div>
 
         <!-- Conteúdo principal -->
@@ -714,7 +728,7 @@
 
             <!-- Resumo e gráficos -->
             <div class="modern-card">
-                <h2 class="text-xl font-bold mb-4">📈 Resumo do Mês</h2>
+                <h2 class="text-xl font-bold mb-4">📈 Resumo do Período</h2>
                 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-blue-50 rounded-lg p-4">
@@ -749,7 +763,7 @@
         <!-- Lista de registros -->
         <div class="modern-card mt-8">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">📋 Registros do Mês</h2>
+                <h2 class="text-xl font-bold">📋 Registros do Período</h2>
                 <div class="text-sm text-gray-600">
                     <span id="totalRegistros">0</span> registros
                 </div>
@@ -892,6 +906,110 @@
         let registros = [];
         let workMode = 'horista'; // 'horista' ou 'mensalista'
         let jsonBinConfig = { ...DEFAULT_JSONBIN_CONFIG };
+        
+        // =============================================
+        // SISTEMA DE PERÍODO DE CÁLCULO (NOVO)
+        // =============================================
+        let calculationPeriod = {
+            startDay: 16, // Dia de início do período (padrão: 16)
+            customPeriod: false // Se usa período personalizado
+        };
+
+        // =============================================
+        // FUNÇÕES DE MANIPULAÇÃO DE DATA CORRIGIDAS
+        // =============================================
+
+        // Converter data para formato brasileiro (DD/MM/AAAA) sem problemas de fuso
+        function toBrazilianDate(dateString) {
+            if (!dateString) return '';
+            
+            // Para evitar problemas de fuso horário, trabalhamos com a data como string
+            const [year, month, day] = dateString.split('-');
+            return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
+        }
+
+        // Converter para formato ISO sem problemas de fuso (YYYY-MM-DD)
+        function toISODate(dateString) {
+            if (!dateString) return '';
+            
+            // Se já estiver no formato ISO, retorna como está
+            if (dateString.includes('-')) {
+                return dateString;
+            }
+            
+            // Se estiver no formato brasileiro, converte
+            if (dateString.includes('/')) {
+                const [day, month, year] = dateString.split('/');
+                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
+            }
+            
+            return dateString;
+        }
+
+        // Obter data atual no formato brasileiro (CORREÇÃO DO FUSO HORÁRIO)
+        function getCurrentBrazilianDate() {
+            const now = new Date();
+            // Ajustar para fuso de Brasília (UTC-3)
+            const offset = -3 * 60; // Brasília UTC-3 em minutos
+            const brasiliaTime = new Date(now.getTime() + offset * 60 * 1000);
+            
+            const year = brasiliaTime.getUTCFullYear();
+            const month = String(brasiliaTime.getUTCMonth() + 1).padStart(2, '0');
+            const day = String(brasiliaTime.getUTCDate()).padStart(2, '0');
+            
+            return `${year}-${month}-${day}`;
+        }
+
+        // Obter o período de cálculo para uma data específica
+        function getCalculationPeriod(dateString = null) {
+            const date = dateString ? new Date(dateString) : new Date();
+            const year = date.getFullYear();
+            const month = date.getMonth();
+            
+            if (calculationPeriod.customPeriod) {
+                // Usar período personalizado (ex: 01 a 30)
+                const startDate = new Date(year, month, calculationPeriod.startDay);
+                const endDate = new Date(year, month + 1, calculationPeriod.startDay - 1);
+                return { startDate, endDate };
+            } else {
+                // Usar período padrão (16 a 15)
+                let startDate, endDate;
+                
+                if (date.getDate() >= calculationPeriod.startDay) {
+                    // Segunda metade do mês
+                    startDate = new Date(year, month, calculationPeriod.startDay);
+                    endDate = new Date(year, month + 1, calculationPeriod.startDay - 1);
+                } else {
+                    // Primeira metade do mês
+                    startDate = new Date(year, month - 1, calculationPeriod.startDay);
+                    endDate = new Date(year, month, calculationPeriod.startDay - 1);
+                }
+                
+                return { startDate, endDate };
+            }
+        }
+
+        // Filtrar registros pelo período de cálculo
+        function getRegistrosPorPeriodo() {
+            const { startDate, endDate } = getCalculationPeriod();
+            
+            return registros.filter(reg => {
+                const regDate = new Date(reg.data);
+                return regDate >= startDate && regDate <= endDate;
+            });
+        }
+
+        // Atualizar exibição do período atual
+        function updateCurrentPeriodDisplay() {
+            const { startDate, endDate } = getCalculationPeriod();
+            
+            const formatDate = (date) => {
+                return date.toLocaleDateString('pt-BR');
+            };
+            
+            const display = document.getElementById('currentPeriodDisplay');
+            display.textContent = `${formatDate(startDate)} à ${formatDate(endDate)}`;
+        }
 
         // =============================================
         // INICIALIZAÇÃO
@@ -921,6 +1039,9 @@
             initializeYearSelect();
             updateMonthTabs();
             loadMensalistaConfig();
+            
+            // Configurar data atual no formulário (CORREÇÃO DO FUSO HORÁRIO)
+            document.getElementById('data').value = getCurrentBrazilianDate();
         });
 
         // =============================================
@@ -995,6 +1116,23 @@
             // Admin
             document.getElementById('changeAdminPassword').addEventListener('click', changeAdminPassword);
             document.getElementById('createUserBtn').addEventListener('click', createUser);
+            
+            // Período de cálculo (NOVO)
+            document.querySelectorAll('input[name="periodType"]').forEach(radio => {
+                radio.addEventListener('change', function() {
+                    calculationPeriod.customPeriod = (this.value === 'custom');
+                    document.getElementById('customPeriodConfig').classList.toggle('hidden', !calculationPeriod.customPeriod);
+                    carregarRegistrosMes();
+                    atualizarCalculos();
+                });
+            });
+            
+            document.getElementById('periodStartDay').addEventListener('change', function() {
+                calculationPeriod.startDay = parseInt(this.value);
+                document.getElementById('periodEndDay').value = this.value - 1;
+                carregarRegistrosMes();
+                atualizarCalculos();
+            });
         }
 
         // =============================================
@@ -1091,7 +1229,8 @@
                         mensalistaConfig: {
                             cargaHorariaMensal: 160,
                             salarioMensal: 3000.00
-                        }
+                        },
+                        calculationPeriod: calculationPeriod // Salvar configuração do período
                     },
                     descontos: []
                 };
@@ -1142,6 +1281,7 @@
             updateWorkModeUI();
             carregarRegistrosMes();
             atualizarDashboard();
+            updateCurrentPeriodDisplay();
         }
 
         function showAdminScreen() {
@@ -1280,6 +1420,15 @@
                         document.getElementById('valorHoraExtra').value = userData.settings.valorHoraExtra || 50;
                         workMode = userData.settings.workMode || 'horista';
                         
+                        // Carregar configuração do período de cálculo
+                        if (userData.settings.calculationPeriod) {
+                            calculationPeriod = userData.settings.calculationPeriod;
+                            document.querySelector(`input[name="periodType"][value="${calculationPeriod.customPeriod ? 'custom' : 'standard'}"]`).checked = true;
+                            document.getElementById('periodStartDay').value = calculationPeriod.startDay;
+                            document.getElementById('periodEndDay').value = calculationPeriod.startDay - 1;
+                            document.getElementById('customPeriodConfig').classList.toggle('hidden', !calculationPeriod.customPeriod);
+                        }
+                        
                         // Atualizar modo de trabalho na UI
                         document.querySelectorAll('.modern-tab').forEach(tab => {
                             tab.classList.remove('active');
@@ -1325,6 +1474,7 @@
                         valorHoraAula: parseFloat(document.getElementById('valorHoraAula').value),
                         valorHoraExtra: parseInt(document.getElementById('valorHoraExtra').value),
                         workMode: workMode,
+                        calculationPeriod: calculationPeriod, // Salvar configuração do período
                         mensalistaConfig: {
                             cargaHorariaMensal: parseInt(document.getElementById('cargaHorariaMensal').value),
                             salarioMensal: parseFloat(document.getElementById('salarioMensal').value)
@@ -1359,6 +1509,9 @@
                 return;
             }
             
+            // CORREÇÃO: Garantir que a data seja salva exatamente como informada
+            const dataCorrigida = toISODate(data);
+            
             // Coletar horários adicionais
             const horariosAdicionais = [];
             document.querySelectorAll('.horario-adicional').forEach(div => {
@@ -1376,7 +1529,7 @@
             // Criar registro
             const registro = {
                 id: Date.now(),
-                data,
+                data: dataCorrigida, // Usar data corrigida
                 entrada,
                 saida,
                 intervaloSaida: intervaloSaida || '',
@@ -1434,28 +1587,25 @@
             const tabela = document.getElementById('registrosTabela');
             tabela.innerHTML = '';
             
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
-            });
+            // USAR PERÍODO DE CÁLCULO EM VEZ DE MÊS/ANO FIXO
+            const registrosPeriodo = getRegistrosPorPeriodo();
             
             // Ordenar por data (mais recente primeiro)
-            registrosMes.sort((a, b) => new Date(b.data) - new Date(a.data));
+            registrosPeriodo.sort((a, b) => new Date(b.data) - new Date(a.data));
             
-            document.getElementById('totalRegistros').textContent = registrosMes.length;
+            document.getElementById('totalRegistros').textContent = registrosPeriodo.length;
             
-            if (registrosMes.length === 0) {
-                tabela.innerHTML = '<tr><td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">Nenhum registro encontrado para este mês</td></tr>';
+            if (registrosPeriodo.length === 0) {
+                tabela.innerHTML = '<tr><td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">Nenhum registro encontrado para este período</td></tr>';
                 return;
             }
             
-            registrosMes.forEach(registro => {
+            registrosPeriodo.forEach(registro => {
                 const tr = document.createElement('tr');
                 tr.className = 'time-entry';
                 
-                // Formatar data
-                const dataObj = new Date(registro.data);
-                const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+                // USAR FUNÇÃO CORRIGIDA PARA FORMATAR DATA
+                const dataFormatada = toBrazilianDate(registro.data);
                 
                 // Calcular horas extras (se aplicável)
                 const horasExtras = calcularHorasExtras(registro.totalHoras);
@@ -1521,7 +1671,7 @@
             if (!registro) return;
             
             document.getElementById('editId').value = registro.id;
-            document.getElementById('editData').value = registro.data;
+            document.getElementById('editData').value = registro.data; // Já está no formato correto
             document.getElementById('editEntrada').value = registro.entrada;
             document.getElementById('editSaida').value = registro.saida;
             document.getElementById('editIntervaloSaida').value = registro.intervaloSaida || '';
@@ -1551,6 +1701,9 @@
                 return;
             }
             
+            // CORREÇÃO: Garantir que a data seja salva exatamente como informada
+            const dataCorrigida = toISODate(data);
+            
             // Encontrar e atualizar registro
             const index = registros.findIndex(r => r.id === id);
             if (index === -1) return;
@@ -1561,7 +1714,7 @@
             
             registros[index] = {
                 ...registros[index],
-                data,
+                data: dataCorrigida, // Usar data corrigida
                 entrada,
                 saida,
                 intervaloSaida: intervaloSaida || '',
@@ -1601,6 +1754,8 @@
         function limparFormulario() {
             document.getElementById('pontoForm').reset();
             document.getElementById('horariosAdicionais').innerHTML = '';
+            // Restaurar data atual corrigida
+            document.getElementById('data').value = getCurrentBrazilianDate();
         }
 
         function adicionarHorario() {
@@ -1632,10 +1787,8 @@
         }
 
         function atualizarCalculosHorista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
-            });
+            // USAR REGISTROS DO PERÍODO EM VEZ DO MÊS
+            const registrosPeriodo = getRegistrosPorPeriodo();
             
             // Calcular totais
             let totalHoras = 0;
@@ -1643,7 +1796,7 @@
             let totalHorasExtras = 0;
             let totalMinutosExtras = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1696,27 +1849,25 @@
             document.getElementById('dashboardHorasExtras').textContent = totalHorasExtrasFormatado;
             
             // Calcular média semanal
-            const semanasNoMes = Math.ceil(registrosMes.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoMes > 0 ? totalHoras / semanasNoMes : 0;
+            const semanasNoPeriodo = Math.ceil(registrosPeriodo.length / 5); // Aproximação
+            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
             const mediaHoras = Math.floor(mediaSemanalHoras);
             const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
             document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
             
             // Atualizar gráficos
-            atualizarGraficos(registrosMes);
+            atualizarGraficos(registrosPeriodo);
         }
 
         function atualizarCalculosMensalista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
-            });
+            // USAR REGISTROS DO PERÍODO EM VEZ DO MÊS
+            const registrosPeriodo = getRegistrosPorPeriodo();
             
             // Calcular totais
             let totalHoras = 0;
             let totalMinutos = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1789,14 +1940,14 @@
             document.getElementById('dashboardHorasExtras').textContent = diferencaMinutos > 0 ? `+${diferencaFormatada}` : '00:00';
             
             // Calcular média semanal
-            const semanasNoMes = Math.ceil(registrosMes.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoMes > 0 ? totalHoras / semanasNoMes : 0;
+            const semanasNoPeriodo = Math.ceil(registrosPeriodo.length / 5); // Aproximação
+            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
             const mediaHoras = Math.floor(mediaSemanalHoras);
             const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
             document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
             
             // Atualizar gráficos
-            atualizarGraficos(registrosMes);
+            atualizarGraficos(registrosPeriodo);
         }
 
         function calcularSalarioCompleto() {
@@ -1808,10 +1959,8 @@
         }
 
         function calcularSalarioHorista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
-            });
+            // USAR REGISTROS DO PERÍODO
+            const registrosPeriodo = getRegistrosPorPeriodo();
             
             // Calcular totais
             let totalHoras = 0;
@@ -1819,7 +1968,7 @@
             let totalHorasExtras = 0;
             let totalMinutosExtras = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1903,16 +2052,14 @@
         }
 
         function calcularSalarioMensalista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
-            });
+            // USAR REGISTROS DO PERÍODO
+            const registrosPeriodo = getRegistrosPorPeriodo();
             
             // Calcular totais
             let totalHoras = 0;
             let totalMinutos = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -2088,19 +2235,19 @@
         }
 
         // =============================================
-        // FUNÇões DE GRÁFICOS
+        // FUNÇÕES DE GRÁFICOS
         // =============================================
-        function atualizarGraficos(registrosMes) {
-            atualizarGraficoHorasSemanais(registrosMes);
-            atualizarGraficoHorasDiarias(registrosMes);
+        function atualizarGraficos(registrosPeriodo) {
+            atualizarGraficoHorasSemanais(registrosPeriodo);
+            atualizarGraficoHorasDiarias(registrosPeriodo);
         }
 
-        function atualizarGraficoHorasSemanais(registrosMes) {
+        function atualizarGraficoHorasSemanais(registrosPeriodo) {
             const ctx = document.getElementById('horasSemanaisChart').getContext('2d');
             
             // Agrupar por semana
             const semanas = {};
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const data = new Date(reg.data);
                 // Obter número da semana no mês
                 const firstDay = new Date(data.getFullYear(), data.getMonth(), 1);
@@ -2153,19 +2300,19 @@
             });
         }
 
-        function atualizarGraficoHorasDiarias(registrosMes) {
+        function atualizarGraficoHorasDiarias(registrosPeriodo) {
             const ctx = document.getElementById('horasDiariasChart').getContext('2d');
             
             // Ordenar registros por data
-            registrosMes.sort((a, b) => new Date(a.data) - new Date(b.data));
+            registrosPeriodo.sort((a, b) => new Date(a.data) - new Date(b.data));
             
             // Preparar dados para o gráfico
-            const labels = registrosMes.map(reg => {
+            const labels = registrosPeriodo.map(reg => {
                 const data = new Date(reg.data);
                 return data.getDate().toString().padStart(2, '0') + '/' + (data.getMonth() + 1).toString().padStart(2, '0');
             });
             
-            const data = registrosMes.map(reg => {
+            const data = registrosPeriodo.map(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 return horas + (minutos / 60);
             });
@@ -2397,6 +2544,7 @@
                     valorHoraAula: 50.00,
                     valorHoraExtra: 50,
                     workMode: 'horista',
+                    calculationPeriod: calculationPeriod, // Salvar configuração do período
                     mensalistaConfig: {
                         cargaHorariaMensal: 160,
                         salarioMensal: 3000.00
