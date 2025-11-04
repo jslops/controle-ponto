@@ -137,6 +137,15 @@
                 margin: 20px auto;
                 padding: 20px;
             }
+            .modern-card {
+                padding: 16px;
+            }
+            .modern-tabs {
+                flex-direction: column;
+            }
+            .modern-tab {
+                margin-bottom: 5px;
+            }
         }
         
         /* Loading animation */
@@ -186,6 +195,13 @@
             padding: 10px 16px;
             font-weight: 500;
             transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
         }
         .btn-primary:hover {
             background-color: var(--primary-dark);
@@ -200,6 +216,13 @@
             padding: 10px 16px;
             font-weight: 500;
             transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
         }
         .btn-secondary:hover {
             background-color: var(--secondary-dark);
@@ -214,6 +237,13 @@
             padding: 10px 16px;
             font-weight: 500;
             transition: all 0.2s ease;
+            border: none;
+            cursor: pointer;
+            display: inline-flex;
+            align-items: center;
+            justify-content: center;
+            gap: 8px;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
         }
         .btn-accent:hover {
             background-color: var(--accent-dark);
@@ -240,6 +270,8 @@
             padding: 12px;
             width: 100%;
             transition: all 0.2s ease;
+            font-size: clamp(0.875rem, 2.5vw, 1rem);
+            box-sizing: border-box;
         }
         .modern-input:focus {
             outline: none;
@@ -284,6 +316,16 @@
         .work-mode-mensalista {
             background-color: rgba(139, 92, 246, 0.1);
             color: var(--accent);
+        }
+
+        /* Melhorias para tabelas em mobile */
+        @media (max-width: 768px) {
+            .table-container {
+                overflow-x: auto;
+            }
+            table {
+                min-width: 600px;
+            }
         }
     </style>
 </head>
@@ -732,44 +774,55 @@
                 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-blue-50 rounded-lg p-4">
-                        <p class="text-sm text-blue-700">Total de Horas</p>
-                        <p class="text-2xl font-bold text-blue-800" id="totalHoras">00:00</p>
+                        <p class="text-sm text-blue-700">Horas Trabalhadas</p>
+                        <p class="text-2xl font-bold text-blue-800" id="resumoHorasTrabalhadas">00:00</p>
                     </div>
                     <div class="bg-green-50 rounded-lg p-4">
-                        <p class="text-sm text-green-700">Salário Líquido</p>
-                        <p class="text-2xl font-bold text-green-800" id="salarioLiquido">R$ 0,00</p>
+                        <p class="text-sm text-green-700">Salário Bruto</p>
+                        <p class="text-2xl font-bold text-green-800" id="resumoSalarioBruto">R$ 0,00</p>
                     </div>
                 </div>
                 
                 <div class="mb-6">
-                    <h3 class="font-medium mb-2">Horas por Semana</h3>
-                    <canvas id="horasSemanaisChart" height="150"></canvas>
+                    <h3 class="font-medium mb-2">Horas por Dia</h3>
+                    <div class="h-48">
+                        <canvas id="horasChart"></canvas>
+                    </div>
                 </div>
                 
-                <div class="no-print">
-                    <button id="imprimirRelatorio" class="btn-accent w-full">
+                <div class="mb-4">
+                    <h3 class="font-medium mb-2">Distribuição de Horas</h3>
+                    <div class="h-48">
+                        <canvas id="distribuicaoChart"></canvas>
+                    </div>
+                </div>
+                
+                <div class="flex justify-between mt-4 no-print">
+                    <button id="imprimirRelatorio" class="btn-primary">
                         <i class="fas fa-print"></i> Imprimir Relatório
+                    </button>
+                    <button id="exportarDados" class="btn-secondary">
+                        <i class="fas fa-file-export"></i> Exportar Dados
                     </button>
                 </div>
             </div>
         </div>
 
-        <!-- Gráfico de horas por dia -->
-        <div class="modern-card mt-8">
-            <h2 class="text-xl font-bold mb-4">📊 Horas Trabalhadas por Dia</h2>
-            <canvas id="horasDiariasChart" height="100"></canvas>
-        </div>
-
-        <!-- Lista de registros -->
-        <div class="modern-card mt-8">
+        <!-- Tabela de registros -->
+        <div class="mt-8 modern-card">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">📋 Registros do Período</h2>
-                <div class="text-sm text-gray-600">
-                    <span id="totalRegistros">0</span> registros
+                <h2 class="text-xl font-bold">📋 Registros de Ponto</h2>
+                <div class="flex space-x-2">
+                    <button id="filtrarRegistros" class="btn-primary text-sm">
+                        <i class="fas fa-filter"></i> Filtrar
+                    </button>
+                    <button id="limparFiltros" class="btn-primary bg-gray-500 hover:bg-gray-600 text-sm">
+                        <i class="fas fa-times"></i> Limpar Filtros
+                    </button>
                 </div>
             </div>
             
-            <div class="overflow-x-auto">
+            <div class="table-container">
                 <table class="w-full border-collapse">
                     <thead>
                         <tr class="bg-gray-100">
@@ -791,1884 +844,1540 @@
     </div>
 
     <!-- Modal para edição de registro -->
-    <div id="editModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
+    <div id="editarModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
         <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">Editar Registro</h3>
-            <form id="editForm">
-                <input type="hidden" id="editId">
+            <h2 class="text-xl font-bold mb-4">Editar Registro</h2>
+            <form id="editarForm">
+                <input type="hidden" id="editarId">
                 <div class="mb-4">
-                    <label for="editData" class="block text-sm font-medium text-gray-700 mb-1">Data:</label>
-                    <input type="date" id="editData" class="modern-input" required>
+                    <label for="editarData" class="block text-sm font-medium text-gray-700 mb-1">Data:</label>
+                    <input type="date" id="editarData" class="modern-input" required>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="editEntrada" class="block text-sm font-medium text-gray-700 mb-1">Entrada:</label>
-                        <input type="time" id="editEntrada" class="modern-input" required>
+                        <label for="editarEntrada" class="block text-sm font-medium text-gray-700 mb-1">Entrada:</label>
+                        <input type="time" id="editarEntrada" class="modern-input" required>
                     </div>
                     <div>
-                        <label for="editSaida" class="block text-sm font-medium text-gray-700 mb-1">Saída:</label>
-                        <input type="time" id="editSaida" class="modern-input" required>
+                        <label for="editarSaida" class="block text-sm font-medium text-gray-700 mb-1">Saída:</label>
+                        <input type="time" id="editarSaida" class="modern-input" required>
                     </div>
                 </div>
                 <div class="grid grid-cols-2 gap-4 mb-4">
                     <div>
-                        <label for="editIntervaloSaida" class="block text-sm font-medium text-gray-700 mb-1">Saída Intervalo:</label>
-                        <input type="time" id="editIntervaloSaida" class="modern-input">
+                        <label for="editarIntervaloSaida" class="block text-sm font-medium text-gray-700 mb-1">Saída Intervalo:</label>
+                        <input type="time" id="editarIntervaloSaida" class="modern-input">
                     </div>
                     <div>
-                        <label for="editIntervaloRetorno" class="block text-sm font-medium text-gray-700 mb-1">Retorno Intervalo:</label>
-                        <input type="time" id="editIntervaloRetorno" class="modern-input">
+                        <label for="editarIntervaloRetorno" class="block text-sm font-medium text-gray-700 mb-1">Retorno Intervalo:</label>
+                        <input type="time" id="editarIntervaloRetorno" class="modern-input">
                     </div>
                 </div>
                 <div class="mb-4">
-                    <label for="editObservacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações:</label>
-                    <textarea id="editObservacoes" class="modern-input" rows="2"></textarea>
+                    <label for="editarObservacoes" class="block text-sm font-medium text-gray-700 mb-1">Observações:</label>
+                    <textarea id="editarObservacoes" class="modern-input" rows="2"></textarea>
                 </div>
-                <div class="flex justify-end gap-4">
-                    <button type="button" id="cancelEdit" class="btn-primary bg-gray-500 hover:bg-gray-600">
+                <div class="flex justify-end space-x-2">
+                    <button type="button" id="cancelarEdicao" class="btn-primary bg-gray-500 hover:bg-gray-600">
                         Cancelar
                     </button>
-                    <button type="submit" class="btn-primary">
-                        Salvar
+                    <button type="submit" class="btn-secondary">
+                        Salvar Alterações
                     </button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Modal de resultado de cálculo -->
-    <div id="resultModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">💰 Cálculo de Salário</h3>
-            <div id="resultContent" class="space-y-2">
-                <!-- Conteúdo será preenchido via JavaScript -->
-            </div>
-            <div class="mt-6 flex justify-end">
-                <button id="closeResult" class="btn-primary">
-                    Fechar
-                </button>
-            </div>
-        </div>
-    </div>
-
-    <!-- Configuração do JSONBin -->
-    <div id="configModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center hidden z-50">
-        <div class="bg-white rounded-lg p-6 w-full max-w-md">
-            <h3 class="text-xl font-bold mb-4">⚙️ Configuração do JSONBin</h3>
-            <div class="mb-4">
-                <p class="text-sm text-gray-600 mb-4">
-                    Para usar o sistema, você precisa configurar uma conta no JSONBin.io e inserir sua chave de API e ID do bin abaixo.
-                </p>
-                <label for="jsonBinApiKey" class="block text-sm font-medium text-gray-700 mb-1">Chave da API JSONBin:</label>
-                <input type="text" id="jsonBinApiKey" class="modern-input" placeholder="Sua chave de API">
-            </div>
-            <div class="mb-4">
-                <label for="jsonBinId" class="block text-sm font-medium text-gray-700 mb-1">ID do Bin:</label>
-                <input type="text" id="jsonBinId" class="modern-input" placeholder="ID do seu bin">
-            </div>
-            <div class="bg-blue-50 rounded-lg p-4 mb-4">
-                <h4 class="font-medium text-blue-800 mb-2">Como obter essas informações:</h4>
-                <ol class="text-sm text-blue-700 list-decimal pl-4 space-y-1">
-                    <li>Crie uma conta em <a href="https://jsonbin.io" target="_blank" class="underline">jsonbin.io</a></li>
-                    <li>Vá para "My Bins" e crie um novo bin</li>
-                    <li>Copie o "Bin ID"</li>
-                    <li>Vá para "API Keys" e copie sua "Secret Key"</li>
-                </ol>
-            </div>
-            <div class="flex justify-end gap-4">
-                <button id="cancelConfig" class="btn-primary bg-gray-500 hover:bg-gray-600">
-                    Cancelar
-                </button>
-                <button id="saveConfig" class="btn-primary">
-                    Salvar
-                </button>
-            </div>
-        </div>
-    </div>
-
     <script>
-        // =============================================
-        // CONFIGURAÇÃO DO JSONBIN
-        // =============================================
-        // Credenciais já configuradas para uso imediato
-        const DEFAULT_JSONBIN_CONFIG = {
-            apiKey: '$2a$10$AKM30q2AE/6WJhXqS2dft.8Luvw0h6GHLQWhtcUBQc12SCGK3oRra',
-            binId: '6909065ed0ea881f40d1a114'
+        // Configuração da API JSONBin
+        const API_CONFIG = {
+            BIN_ID: '67f9e7a0ad19ca34f8d8e5c1',
+            API_KEY: '$2a$10$h.9Gt6v7v.V8p4p6p5v6v.V8p4p6p5v6v.V8p4p6p5v6v.V8p4p6p5v6v'
         };
 
-        // =============================================
-        // VARIÁVEIS GLOBAIS
-        // =============================================
-        let currentUser = null;
-        let usersData = {};
-        let currentMonth = new Date().getMonth();
-        let currentYear = new Date().getFullYear();
-        let registros = [];
-        let workMode = 'horista'; // 'horista' ou 'mensalista'
-        let jsonBinConfig = { ...DEFAULT_JSONBIN_CONFIG };
-        
-        // =============================================
-        // SISTEMA DE PERÍODO DE CÁLCULO (NOVO)
-        // =============================================
-        let calculationPeriod = {
-            startDay: 16, // Dia de início do período (padrão: 16)
-            customPeriod: false // Se usa período personalizado
+        // Estado da aplicação
+        let state = {
+            registros: [],
+            usuarioAtual: null,
+            modoTrabalho: 'horista', // 'horista' ou 'mensalista'
+            periodoCalculo: {
+                tipo: 'standard', // 'standard' ou 'custom'
+                diaInicio: 16,
+                diaFim: 15
+            },
+            valorHoraAula: 50.00,
+            valorHoraExtra: 50, // Percentual
+            descontos: [],
+            usuarios: [],
+            admin: false
         };
 
-        // =============================================
-        // FUNÇÕES DE MANIPULAÇÃO DE DATA CORRIGIDAS
-        // =============================================
-
-        // Converter data para formato brasileiro (DD/MM/AAAA) sem problemas de fuso
-        function toBrazilianDate(dateString) {
-            if (!dateString) return '';
+        // Elementos DOM
+        const elementos = {
+            // Telas
+            loginScreen: document.getElementById('loginScreen'),
+            appScreen: document.getElementById('appScreen'),
+            adminScreen: document.getElementById('adminScreen'),
             
-            // Para evitar problemas de fuso horário, trabalhamos com a data como string
-            const [year, month, day] = dateString.split('-');
-            return `${day.padStart(2, '0')}/${month.padStart(2, '0')}/${year}`;
-        }
-
-        // Converter para formato ISO sem problemas de fuso (YYYY-MM-DD)
-        function toISODate(dateString) {
-            if (!dateString) return '';
+            // Login
+            loginForm: document.getElementById('loginForm'),
+            registerForm: document.getElementById('registerForm'),
+            loginUsername: document.getElementById('loginUsername'),
+            loginPassword: document.getElementById('loginPassword'),
+            loginBtn: document.getElementById('loginBtn'),
+            loginText: document.getElementById('loginText'),
+            loginLoading: document.getElementById('loginLoading'),
+            showRegister: document.getElementById('showRegister'),
+            registerUsername: document.getElementById('registerUsername'),
+            registerPassword: document.getElementById('registerPassword'),
+            confirmPassword: document.getElementById('confirmPassword'),
+            registerBtn: document.getElementById('registerBtn'),
+            registerText: document.getElementById('registerText'),
+            registerLoading: document.getElementById('registerLoading'),
+            showLogin: document.getElementById('showLogin'),
             
-            // Se já estiver no formato ISO, retorna como está
-            if (dateString.includes('-')) {
-                return dateString;
-            }
+            // App principal
+            userWelcome: document.getElementById('userWelcome'),
+            workModeIndicator: document.getElementById('workModeIndicator'),
+            darkModeToggle: document.getElementById('darkModeToggle'),
+            exportBtn: document.getElementById('exportBtn'),
+            importBtn: document.getElementById('importBtn'),
+            importFile: document.getElementById('importFile'),
+            logoutBtn: document.getElementById('logoutBtn'),
             
-            // Se estiver no formato brasileiro, converte
-            if (dateString.includes('/')) {
-                const [day, month, year] = dateString.split('/');
-                return `${year}-${month.padStart(2, '0')}-${day.padStart(2, '0')}`;
-            }
-            
-            return dateString;
-        }
-
-        // Obter data atual no formato brasileiro (CORREÇÃO DO FUSO HORÁRIO)
-        function getCurrentBrazilianDate() {
-            const now = new Date();
-            // Ajustar para fuso de Brasília (UTC-3)
-            const offset = -3 * 60; // Brasília UTC-3 em minutos
-            const brasiliaTime = new Date(now.getTime() + offset * 60 * 1000);
-            
-            const year = brasiliaTime.getUTCFullYear();
-            const month = String(brasiliaTime.getUTCMonth() + 1).padStart(2, '0');
-            const day = String(brasiliaTime.getUTCDate()).padStart(2, '0');
-            
-            return `${year}-${month}-${day}`;
-        }
-
-        // Obter o período de cálculo para uma data específica
-        function getCalculationPeriod(dateString = null) {
-            const date = dateString ? new Date(dateString) : new Date();
-            const year = date.getFullYear();
-            const month = date.getMonth();
-            
-            if (calculationPeriod.customPeriod) {
-                // Usar período personalizado (ex: 01 a 30)
-                const startDate = new Date(year, month, calculationPeriod.startDay);
-                const endDate = new Date(year, month + 1, calculationPeriod.startDay - 1);
-                return { startDate, endDate };
-            } else {
-                // Usar período padrão (16 a 15)
-                let startDate, endDate;
-                
-                if (date.getDate() >= calculationPeriod.startDay) {
-                    // Segunda metade do mês
-                    startDate = new Date(year, month, calculationPeriod.startDay);
-                    endDate = new Date(year, month + 1, calculationPeriod.startDay - 1);
-                } else {
-                    // Primeira metade do mês
-                    startDate = new Date(year, month - 1, calculationPeriod.startDay);
-                    endDate = new Date(year, month, calculationPeriod.startDay - 1);
-                }
-                
-                return { startDate, endDate };
-            }
-        }
-
-        // Filtrar registros pelo período de cálculo
-        function getRegistrosPorPeriodo() {
-            const { startDate, endDate } = getCalculationPeriod();
-            
-            return registros.filter(reg => {
-                const regDate = new Date(reg.data);
-                return regDate >= startDate && regDate <= endDate;
-            });
-        }
-
-        // Atualizar exibição do período atual
-        function updateCurrentPeriodDisplay() {
-            const { startDate, endDate } = getCalculationPeriod();
-            
-            const formatDate = (date) => {
-                return date.toLocaleDateString('pt-BR');
-            };
-            
-            const display = document.getElementById('currentPeriodDisplay');
-            display.textContent = `${formatDate(startDate)} à ${formatDate(endDate)}`;
-        }
-
-        // =============================================
-        // INICIALIZAÇÃO
-        // =============================================
-        document.addEventListener('DOMContentLoaded', function() {
-            // Verificar se há configuração salva
-            const savedConfig = localStorage.getItem('jsonBinConfig');
-            if (savedConfig) {
-                jsonBinConfig = JSON.parse(savedConfig);
-            }
-
-            // Verificar se há usuário logado
-            const loggedInUser = localStorage.getItem('loggedInUser');
-            if (loggedInUser) {
-                currentUser = JSON.parse(loggedInUser);
-                if (currentUser.username === 'admin') {
-                    showAdminScreen();
-                } else {
-                    loadUserData();
-                }
-            } else {
-                showLoginScreen();
-            }
-
-            // Configurar eventos
-            setupEventListeners();
-            initializeYearSelect();
-            updateMonthTabs();
-            loadMensalistaConfig();
-            
-            // Configurar data atual no formulário (CORREÇÃO DO FUSO HORÁRIO)
-            document.getElementById('data').value = getCurrentBrazilianDate();
-        });
-
-        // =============================================
-        // CONFIGURAÇÃO DE EVENTOS
-        // =============================================
-        function setupEventListeners() {
-            // Login/Registro
-            document.getElementById('loginBtn').addEventListener('click', handleLogin);
-            document.getElementById('registerBtn').addEventListener('click', handleRegister);
-            document.getElementById('showRegister').addEventListener('click', showRegisterForm);
-            document.getElementById('showLogin').addEventListener('click', showLoginForm);
-            
-            // Logout
-            document.getElementById('logoutBtn').addEventListener('click', handleLogout);
-            document.getElementById('adminLogoutBtn').addEventListener('click', handleLogout);
-            
-            // Formulário de ponto
-            document.getElementById('pontoForm').addEventListener('submit', handlePontoSubmit);
-            document.getElementById('limparForm').addEventListener('click', limparFormulario);
-            document.getElementById('adicionarHorario').addEventListener('click', adicionarHorario);
-            
-            // Configurações de salário
-            document.getElementById('calcularSalario').addEventListener('click', calcularSalarioCompleto);
-            document.getElementById('adicionarDesconto').addEventListener('click', adicionarDesconto);
-            document.getElementById('valorHoraAula').addEventListener('change', atualizarCalculos);
-            document.getElementById('valorHoraExtra').addEventListener('change', atualizarCalculos);
-            
-            // Navegação
-            document.getElementById('yearSelect').addEventListener('change', function() {
-                currentYear = parseInt(this.value);
-                updateMonthTabs();
-                carregarRegistrosMes();
-            });
-            
-            // Impressão
-            document.getElementById('imprimirRelatorio').addEventListener('click', imprimirRelatorio);
-            
-            // Exportação/Importação
-            document.getElementById('exportBtn').addEventListener('click', exportarDados);
-            document.getElementById('importBtn').addEventListener('click', () => document.getElementById('importFile').click());
-            document.getElementById('importFile').addEventListener('change', importarDados);
-            
-            // Modo escuro
-            document.getElementById('darkModeToggle').addEventListener('click', toggleDarkMode);
-            
-            // Modal de edição
-            document.getElementById('cancelEdit').addEventListener('click', fecharModalEdicao);
-            document.getElementById('editForm').addEventListener('submit', handleEditSubmit);
-            
-            // Modal de resultado
-            document.getElementById('closeResult').addEventListener('click', fecharModalResultado);
-            
-            // Configuração do JSONBin
-            document.getElementById('saveConfig').addEventListener('click', saveJsonBinConfig);
-            document.getElementById('cancelConfig').addEventListener('click', closeConfigModal);
+            // Dashboard
+            dashboardHorasMes: document.getElementById('dashboardHorasMes'),
+            dashboardSalarioMes: document.getElementById('dashboardSalarioMes'),
+            dashboardMediaSemanal: document.getElementById('dashboardMediaSemanal'),
+            dashboardHorasExtras: document.getElementById('dashboardHorasExtras'),
             
             // Modo de trabalho
-            document.querySelectorAll('.modern-tab').forEach(tab => {
-                tab.addEventListener('click', function() {
-                    document.querySelectorAll('.modern-tab').forEach(t => t.classList.remove('active'));
-                    this.classList.add('active');
-                    workMode = this.dataset.mode;
-                    updateWorkModeUI();
-                    saveUserData();
-                });
-            });
+            mensalistaConfig: document.getElementById('mensalistaConfig'),
+            cargaHorariaMensal: document.getElementById('cargaHorariaMensal'),
+            salarioMensal: document.getElementById('salarioMensal'),
+            horasTrabalhadasMensal: document.getElementById('horasTrabalhadasMensal'),
+            horasCompensar: document.getElementById('horasCompensar'),
+            valorCompensar: document.getElementById('valorCompensar'),
             
-            // Configurações de mensalista
-            document.getElementById('cargaHorariaMensal').addEventListener('change', saveMensalistaConfig);
-            document.getElementById('salarioMensal').addEventListener('change', saveMensalistaConfig);
+            // Período de cálculo
+            periodTypeRadios: document.getElementsByName('periodType'),
+            customPeriodConfig: document.getElementById('customPeriodConfig'),
+            periodStartDay: document.getElementById('periodStartDay'),
+            periodEndDay: document.getElementById('periodEndDay'),
+            currentPeriodDisplay: document.getElementById('currentPeriodDisplay'),
+            
+            // Formulário de ponto
+            pontoForm: document.getElementById('pontoForm'),
+            data: document.getElementById('data'),
+            entrada: document.getElementById('entrada'),
+            saida: document.getElementById('saida'),
+            intervaloSaida: document.getElementById('intervaloSaida'),
+            intervaloRetorno: document.getElementById('intervaloRetorno'),
+            observacoes: document.getElementById('observacoes'),
+            adicionarHorario: document.getElementById('adicionarHorario'),
+            horariosAdicionais: document.getElementById('horariosAdicionais'),
+            limparForm: document.getElementById('limparForm'),
+            
+            // Configurações de salário
+            valorHoraAula: document.getElementById('valorHoraAula'),
+            valorHoraExtra: document.getElementById('valorHoraExtra'),
+            infoTotalHoras: document.getElementById('infoTotalHoras'),
+            infoHorasExtras: document.getElementById('infoHorasExtras'),
+            infoValorHora: document.getElementById('infoValorHora'),
+            infoSalarioBruto: document.getElementById('infoSalarioBruto'),
+            descontosContainer: document.getElementById('descontosContainer'),
+            adicionarDesconto: document.getElementById('adicionarDesconto'),
+            calcularSalario: document.getElementById('calcularSalario'),
+            
+            // Resumo
+            resumoHorasTrabalhadas: document.getElementById('resumoHorasTrabalhadas'),
+            resumoSalarioBruto: document.getElementById('resumoSalarioBruto'),
+            imprimirRelatorio: document.getElementById('imprimirRelatorio'),
+            exportarDados: document.getElementById('exportarDados'),
+            
+            // Tabela de registros
+            registrosTabela: document.getElementById('registrosTabela'),
+            filtrarRegistros: document.getElementById('filtrarRegistros'),
+            limparFiltros: document.getElementById('limparFiltros'),
+            
+            // Modal de edição
+            editarModal: document.getElementById('editarModal'),
+            editarForm: document.getElementById('editarForm'),
+            editarId: document.getElementById('editarId'),
+            editarData: document.getElementById('editarData'),
+            editarEntrada: document.getElementById('editarEntrada'),
+            editarSaida: document.getElementById('editarSaida'),
+            editarIntervaloSaida: document.getElementById('editarIntervaloSaida'),
+            editarIntervaloRetorno: document.getElementById('editarIntervaloRetorno'),
+            editarObservacoes: document.getElementById('editarObservacoes'),
+            cancelarEdicao: document.getElementById('cancelarEdicao'),
+            
+            // Toast
+            toast: document.getElementById('toast'),
             
             // Admin
-            document.getElementById('changeAdminPassword').addEventListener('click', changeAdminPassword);
-            document.getElementById('createUserBtn').addEventListener('click', createUser);
-            
-            // Período de cálculo (NOVO)
-            document.querySelectorAll('input[name="periodType"]').forEach(radio => {
-                radio.addEventListener('change', function() {
-                    calculationPeriod.customPeriod = (this.value === 'custom');
-                    document.getElementById('customPeriodConfig').classList.toggle('hidden', !calculationPeriod.customPeriod);
-                    carregarRegistrosMes();
-                    atualizarCalculos();
-                });
-            });
-            
-            document.getElementById('periodStartDay').addEventListener('change', function() {
-                calculationPeriod.startDay = parseInt(this.value);
-                document.getElementById('periodEndDay').value = this.value - 1;
-                carregarRegistrosMes();
-                atualizarCalculos();
-            });
-        }
+            adminLogoutBtn: document.getElementById('adminLogoutBtn'),
+            currentPassword: document.getElementById('currentPassword'),
+            newPassword: document.getElementById('newPassword'),
+            confirmNewPassword: document.getElementById('confirmNewPassword'),
+            changeAdminPassword: document.getElementById('changeAdminPassword'),
+            usersList: document.getElementById('usersList'),
+            newUsername: document.getElementById('newUsername'),
+            newUserPassword: document.getElementById('newUserPassword'),
+            confirmNewUserPassword: document.getElementById('confirmNewUserPassword'),
+            createUserBtn: document.getElementById('createUserBtn')
+        };
 
-        // =============================================
-        // FUNÇÕES DE AUTENTICAÇÃO
-        // =============================================
-        async function handleLogin() {
-            const username = document.getElementById('loginUsername').value;
-            const password = document.getElementById('loginPassword').value;
+        // Funções utilitárias
+        const utils = {
+            // Converter minutos para formato HH:MM
+            minutosParaHoras: (minutos) => {
+                const horas = Math.floor(minutos / 60);
+                const mins = minutos % 60;
+                return `${horas.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
+            },
             
-            if (!username || !password) {
-                showToast('Preencha todos os campos', 'error');
-                return;
-            }
+            // Converter formato HH:MM para minutos
+            horasParaMinutos: (horasStr) => {
+                const [horas, minutos] = horasStr.split(':').map(Number);
+                return horas * 60 + minutos;
+            },
             
-            // Mostrar loading
-            document.getElementById('loginText').classList.add('hidden');
-            document.getElementById('loginLoading').classList.remove('hidden');
+            // Formatar valor monetário
+            formatarMoeda: (valor) => {
+                return new Intl.NumberFormat('pt-BR', {
+                    style: 'currency',
+                    currency: 'BRL'
+                }).format(valor);
+            },
             
-            try {
-                // Carregar dados do JSONBin
-                await loadAllUsersData();
+            // Formatar data para exibição
+            formatarData: (dataStr) => {
+                const data = new Date(dataStr);
+                return data.toLocaleDateString('pt-BR');
+            },
+            
+            // Obter data atual no formato YYYY-MM-DD
+            dataAtual: () => {
+                return new Date().toISOString().split('T')[0];
+            },
+            
+            // Calcular diferença entre dois horários em minutos
+            calcularDiferencaHorarios: (inicio, fim) => {
+                const inicioMinutos = utils.horasParaMinutos(inicio);
+                const fimMinutos = utils.horasParaMinutos(fim);
+                return fimMinutos - inicioMinutos;
+            },
+            
+            // Calcular total de horas trabalhadas em um dia
+            calcularHorasDia: (registro) => {
+                let totalMinutos = 0;
                 
-                // Verificar credenciais
-                if (username === 'admin' && password === usersData.admin?.password) {
-                    currentUser = { username: 'admin' };
-                    localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
-                    showAdminScreen();
-                    showToast('Login realizado com sucesso!', 'success');
-                } else if (usersData[username] && usersData[username].password === password) {
-                    currentUser = { username };
-                    localStorage.setItem('loggedInUser', JSON.stringify(currentUser));
-                    loadUserData();
-                    showToast('Login realizado com sucesso!', 'success');
-                } else {
-                    showToast('Usuário ou senha incorretos', 'error');
+                // Horário principal
+                if (registro.entrada && registro.saida) {
+                    totalMinutos += utils.calcularDiferencaHorarios(registro.entrada, registro.saida);
                 }
-            } catch (error) {
-                console.error('Erro no login:', error);
-                showToast('Erro ao fazer login. Verifique sua conexão.', 'error');
-            } finally {
-                // Ocultar loading
-                document.getElementById('loginText').classList.remove('hidden');
-                document.getElementById('loginLoading').classList.add('hidden');
-            }
-        }
-
-        async function handleRegister() {
-            const username = document.getElementById('registerUsername').value;
-            const password = document.getElementById('registerPassword').value;
-            const confirmPassword = document.getElementById('confirmPassword').value;
-            
-            if (!username || !password || !confirmPassword) {
-                showToast('Preencha todos os campos', 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showToast('As senhas não coincidem', 'error');
-                return;
-            }
-            
-            if (username.length < 3) {
-                showToast('O usuário deve ter pelo menos 3 caracteres', 'error');
-                return;
-            }
-            
-            if (password.length < 4) {
-                showToast('A senha deve ter pelo menos 4 caracteres', 'error');
-                return;
-            }
-            
-            // Mostrar loading
-            document.getElementById('registerText').classList.add('hidden');
-            document.getElementById('registerLoading').classList.remove('hidden');
-            
-            try {
-                // Carregar dados existentes
-                await loadAllUsersData();
                 
-                // Verificar se o usuário já existe
-                if (usersData[username]) {
-                    showToast('Este usuário já existe', 'error');
+                // Intervalo (subtrair)
+                if (registro.intervaloSaida && registro.intervaloRetorno) {
+                    totalMinutos -= utils.calcularDiferencaHorarios(registro.intervaloSaida, registro.intervaloRetorno);
+                }
+                
+                // Horários adicionais
+                if (registro.horariosAdicionais) {
+                    registro.horariosAdicionais.forEach(horario => {
+                        if (horario.entrada && horario.saida) {
+                            totalMinutos += utils.calcularDiferencaHorarios(horario.entrada, horario.saida);
+                        }
+                    });
+                }
+                
+                return totalMinutos;
+            },
+            
+            // Mostrar notificação toast
+            mostrarToast: (mensagem, tipo = 'success') => {
+                elementos.toast.textContent = mensagem;
+                elementos.toast.className = `toast ${tipo}`;
+                elementos.toast.classList.remove('hidden');
+                elementos.toast.classList.add('show');
+                
+                setTimeout(() => {
+                    elementos.toast.classList.remove('show');
+                    setTimeout(() => {
+                        elementos.toast.classList.add('hidden');
+                    }, 300);
+                }, 3000);
+            },
+            
+            // Gerar ID único
+            gerarId: () => {
+                return Date.now().toString(36) + Math.random().toString(36).substr(2);
+            }
+        };
+
+        // Funções de API
+        const api = {
+            // Buscar dados do JSONBin
+            buscarDados: async () => {
+                try {
+                    const response = await fetch(`https://api.jsonbin.io/v3/b/${API_CONFIG.BIN_ID}/latest`, {
+                        method: 'GET',
+                        headers: {
+                            'X-Master-Key': API_CONFIG.API_KEY,
+                            'Content-Type': 'application/json'
+                        }
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erro ao buscar dados');
+                    }
+                    
+                    const data = await response.json();
+                    return data.record || {};
+                } catch (error) {
+                    console.error('Erro ao buscar dados:', error);
+                    utils.mostrarToast('Erro ao carregar dados. Verifique sua conexão.', 'error');
+                    return {};
+                }
+            },
+            
+            // Salvar dados no JSONBin
+            salvarDados: async (dados) => {
+                try {
+                    const response = await fetch(`https://api.jsonbin.io/v3/b/${API_CONFIG.BIN_ID}`, {
+                        method: 'PUT',
+                        headers: {
+                            'X-Master-Key': API_CONFIG.API_KEY,
+                            'Content-Type': 'application/json'
+                        },
+                        body: JSON.stringify(dados)
+                    });
+                    
+                    if (!response.ok) {
+                        throw new Error('Erro ao salvar dados');
+                    }
+                    
+                    return await response.json();
+                } catch (error) {
+                    console.error('Erro ao salvar dados:', error);
+                    utils.mostrarToast('Erro ao salvar dados. Verifique sua conexão.', 'error');
+                    return null;
+                }
+            }
+        };
+
+        // Funções de gerenciamento de estado
+        const stateManager = {
+            // Carregar estado inicial
+            carregarEstado: async () => {
+                const dados = await api.buscarDados();
+                
+                if (dados.registros) {
+                    state.registros = dados.registros;
+                }
+                
+                if (dados.usuarios) {
+                    state.usuarios = dados.usuarios;
+                }
+                
+                if (dados.configuracoes) {
+                    state.modoTrabalho = dados.configuracoes.modoTrabalho || 'horista';
+                    state.periodoCalculo = dados.configuracoes.periodoCalculo || state.periodoCalculo;
+                    state.valorHoraAula = dados.configuracoes.valorHoraAula || 50.00;
+                    state.valorHoraExtra = dados.configuracoes.valorHoraExtra || 50;
+                    state.descontos = dados.configuracoes.descontos || [];
+                }
+                
+                // Atualizar UI
+                stateManager.atualizarUI();
+            },
+            
+            // Salvar estado
+            salvarEstado: async () => {
+                const dados = {
+                    registros: state.registros,
+                    usuarios: state.usuarios,
+                    configuracoes: {
+                        modoTrabalho: state.modoTrabalho,
+                        periodoCalculo: state.periodoCalculo,
+                        valorHoraAula: state.valorHoraAula,
+                        valorHoraExtra: state.valorHoraExtra,
+                        descontos: state.descontos
+                    }
+                };
+                
+                await api.salvarDados(dados);
+            },
+            
+            // Atualizar interface com base no estado
+            atualizarUI: () => {
+                // Atualizar modo de trabalho
+                stateManager.atualizarModoTrabalhoUI();
+                
+                // Atualizar período de cálculo
+                stateManager.atualizarPeriodoCalculoUI();
+                
+                // Atualizar configurações de salário
+                elementos.valorHoraAula.value = state.valorHoraAula;
+                elementos.valorHoraExtra.value = state.valorHoraExtra;
+                
+                // Atualizar dashboard
+                stateManager.atualizarDashboard();
+                
+                // Atualizar tabela de registros
+                stateManager.atualizarTabelaRegistros();
+                
+                // Atualizar resumo
+                stateManager.atualizarResumo();
+                
+                // Atualizar descontos
+                stateManager.atualizarDescontosUI();
+            },
+            
+            // Atualizar UI do modo de trabalho
+            atualizarModoTrabalhoUI: () => {
+                // Atualizar abas
+                document.querySelectorAll('.modern-tab').forEach(tab => {
+                    tab.classList.remove('active');
+                    if (tab.dataset.mode === state.modoTrabalho) {
+                        tab.classList.add('active');
+                    }
+                });
+                
+                // Mostrar/ocultar configurações específicas
+                if (state.modoTrabalho === 'mensalista') {
+                    elementos.mensalistaConfig.classList.remove('hidden');
+                    elementos.workModeIndicator.textContent = 'Mensalista';
+                    elementos.workModeIndicator.className = 'work-mode-indicator work-mode-mensalista';
+                } else {
+                    elementos.mensalistaConfig.classList.add('hidden');
+                    elementos.workModeIndicator.textContent = 'Horista';
+                    elementos.workModeIndicator.className = 'work-mode-indicator work-mode-horista';
+                }
+                
+                // Atualizar cálculos para mensalista
+                if (state.modoTrabalho === 'mensalista') {
+                    stateManager.calcularMensalista();
+                }
+            },
+            
+            // Atualizar UI do período de cálculo
+            atualizarPeriodoCalculoUI: () => {
+                // Atualizar radios
+                elementos.periodTypeRadios.forEach(radio => {
+                    radio.checked = radio.value === state.periodoCalculo.tipo;
+                });
+                
+                // Mostrar/ocultar configurações personalizadas
+                if (state.periodoCalculo.tipo === 'custom') {
+                    elementos.customPeriodConfig.classList.remove('hidden');
+                    elementos.periodStartDay.value = state.periodoCalculo.diaInicio;
+                    elementos.periodEndDay.value = state.periodoCalculo.diaFim;
+                } else {
+                    elementos.customPeriodConfig.classList.add('hidden');
+                }
+                
+                // Atualizar display do período atual
+                stateManager.atualizarDisplayPeriodoAtual();
+            },
+            
+            // Atualizar display do período atual
+            atualizarDisplayPeriodoAtual: () => {
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = hoje.getMonth();
+                
+                let inicioPeriodo, fimPeriodo;
+                
+                if (state.periodoCalculo.tipo === 'standard') {
+                    // Período padrão: 16 do mês atual a 15 do próximo mês
+                    inicioPeriodo = new Date(ano, mes, 16);
+                    fimPeriodo = new Date(ano, mes + 1, 15);
+                } else {
+                    // Período personalizado
+                    inicioPeriodo = new Date(ano, mes, state.periodoCalculo.diaInicio);
+                    fimPeriodo = new Date(ano, mes + 1, state.periodoCalculo.diaFim);
+                }
+                
+                elementos.currentPeriodDisplay.textContent = 
+                    `${utils.formatarData(inicioPeriodo.toISOString())} a ${utils.formatarData(fimPeriodo.toISOString())}`;
+            },
+            
+            // Atualizar dashboard
+            atualizarDashboard: () => {
+                const periodoAtual = stateManager.obterPeriodoAtual();
+                const registrosPeriodo = state.registros.filter(registro => {
+                    const dataRegistro = new Date(registro.data);
+                    return dataRegistro >= periodoAtual.inicio && dataRegistro <= periodoAtual.fim;
+                });
+                
+                // Calcular totais
+                let totalMinutos = 0;
+                let totalMinutosExtras = 0;
+                
+                registrosPeriodo.forEach(registro => {
+                    const minutosDia = utils.calcularHorasDia(registro);
+                    totalMinutos += minutosDia;
+                    
+                    // Considerar horas extras (acima de 8h por dia)
+                    if (minutosDia > 8 * 60) {
+                        totalMinutosExtras += minutosDia - (8 * 60);
+                    }
+                });
+                
+                // Calcular salário
+                let salario = 0;
+                
+                if (state.modoTrabalho === 'horista') {
+                    // Horista: valor por hora * total de horas
+                    const horasNormais = Math.max(0, totalMinutos - totalMinutosExtras);
+                    salario = (horasNormais / 60) * state.valorHoraAula;
+                    salario += (totalMinutosExtras / 60) * state.valorHoraAula * (1 + state.valorHoraExtra / 100);
+                } else {
+                    // Mensalista: salário fixo + compensação de horas extras
+                    const cargaHorariaMensal = parseFloat(elementos.cargaHorariaMensal.value) || 160;
+                    const salarioMensal = parseFloat(elementos.salarioMensal.value) || 3000;
+                    const valorHora = salarioMensal / cargaHorariaMensal;
+                    
+                    const horasTrabalhadas = totalMinutos / 60;
+                    const diferencaHoras = horasTrabalhadas - cargaHorariaMensal;
+                    
+                    if (diferencaHoras > 0) {
+                        // Horas extras
+                        salario = salarioMensal + (diferencaHoras * valorHora * (1 + state.valorHoraExtra / 100));
+                    } else if (diferencaHoras < 0) {
+                        // Horas faltantes (desconto)
+                        salario = salarioMensal + (diferencaHoras * valorHora);
+                    } else {
+                        salario = salarioMensal;
+                    }
+                }
+                
+                // Aplicar descontos
+                state.descontos.forEach(desconto => {
+                    salario -= desconto.valor;
+                });
+                
+                // Atualizar elementos
+                elementos.dashboardHorasMes.textContent = utils.minutosParaHoras(totalMinutos);
+                elementos.dashboardSalarioMes.textContent = utils.formatarMoeda(Math.max(0, salario));
+                elementos.dashboardHorasExtras.textContent = utils.minutosParaHoras(totalMinutosExtras);
+                
+                // Calcular média semanal
+                const semanas = Math.max(1, Math.ceil((periodoAtual.fim - periodoAtual.inicio) / (1000 * 60 * 60 * 24 * 7)));
+                const mediaSemanal = totalMinutos / semanas;
+                elementos.dashboardMediaSemanal.textContent = utils.minutosParaHoras(mediaSemanal);
+            },
+            
+            // Atualizar tabela de registros
+            atualizarTabelaRegistros: () => {
+                elementos.registrosTabela.innerHTML = '';
+                
+                if (state.registros.length === 0) {
+                    elementos.registrosTabela.innerHTML = `
+                        <tr>
+                            <td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">
+                                Nenhum registro encontrado. Adicione seu primeiro registro!
+                            </td>
+                        </tr>
+                    `;
                     return;
                 }
                 
-                // Criar novo usuário
-                usersData[username] = {
-                    password: password,
-                    registros: [],
-                    settings: {
-                        valorHoraAula: 50.00,
-                        valorHoraExtra: 50,
-                        workMode: 'horista',
-                        mensalistaConfig: {
-                            cargaHorariaMensal: 160,
-                            salarioMensal: 3000.00
-                        },
-                        calculationPeriod: calculationPeriod // Salvar configuração do período
-                    },
-                    descontos: []
-                };
+                // Ordenar registros por data (mais recente primeiro)
+                const registrosOrdenados = [...state.registros].sort((a, b) => 
+                    new Date(b.data) - new Date(a.data)
+                );
                 
-                // Salvar dados atualizados
-                await saveAllUsersData();
+                registrosOrdenados.forEach(registro => {
+                    const totalMinutos = utils.calcularHorasDia(registro);
+                    const totalHoras = utils.minutosParaHoras(totalMinutos);
+                    
+                    const tr = document.createElement('tr');
+                    tr.className = 'time-entry';
+                    
+                    // Destacar dias com mais de 8 horas
+                    if (totalMinutos > 8 * 60) {
+                        tr.classList.add('exceeded');
+                    }
+                    
+                    tr.innerHTML = `
+                        <td class="border border-gray-300 px-4 py-2">${utils.formatarData(registro.data)}</td>
+                        <td class="border border-gray-300 px-4 py-2">${registro.entrada || '-'}</td>
+                        <td class="border border-gray-300 px-4 py-2">${registro.saida || '-'}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            ${registro.intervaloSaida && registro.intervaloRetorno ? 
+                                `${registro.intervaloSaida} - ${registro.intervaloRetorno}` : '-'}
+                        </td>
+                        <td class="border border-gray-300 px-4 py-2 font-medium">${totalHoras}</td>
+                        <td class="border border-gray-300 px-4 py-2">${registro.observacoes || '-'}</td>
+                        <td class="border border-gray-300 px-4 py-2 no-print">
+                            <button class="btn-primary text-sm mr-1 editar-btn" data-id="${registro.id}">
+                                <i class="fas fa-edit"></i>
+                            </button>
+                            <button class="btn-primary bg-red-500 hover:bg-red-600 text-sm excluir-btn" data-id="${registro.id}">
+                                <i class="fas fa-trash"></i>
+                            </button>
+                        </td>
+                    `;
+                    
+                    elementos.registrosTabela.appendChild(tr);
+                });
                 
-                showToast('Usuário criado com sucesso!', 'success');
-                showLoginForm();
+                // Adicionar event listeners para os botões
+                document.querySelectorAll('.editar-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        stateManager.editarRegistro(id);
+                    });
+                });
                 
-                // Limpar formulário
-                document.getElementById('registerUsername').value = '';
-                document.getElementById('registerPassword').value = '';
-                document.getElementById('confirmPassword').value = '';
-            } catch (error) {
-                console.error('Erro no cadastro:', error);
-                showToast('Erro ao criar usuário. Verifique sua conexão.', 'error');
-            } finally {
-                // Ocultar loading
-                document.getElementById('registerText').classList.remove('hidden');
-                document.getElementById('registerLoading').classList.add('hidden');
-            }
-        }
-
-        function handleLogout() {
-            currentUser = null;
-            localStorage.removeItem('loggedInUser');
-            showLoginScreen();
-            showToast('Logout realizado com sucesso', 'success');
-        }
-
-        // =============================================
-        // FUNÇÕES DE INTERFACE
-        // =============================================
-        function showLoginScreen() {
-            document.getElementById('loginScreen').classList.remove('hidden');
-            document.getElementById('appScreen').classList.add('hidden');
-            document.getElementById('adminScreen').classList.add('hidden');
-        }
-
-        function showAppScreen() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.remove('hidden');
-            document.getElementById('adminScreen').classList.add('hidden');
+                document.querySelectorAll('.excluir-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        const id = btn.dataset.id;
+                        stateManager.excluirRegistro(id);
+                    });
+                });
+            },
             
-            // Atualizar interface do usuário
-            document.getElementById('userWelcome').textContent = currentUser.username;
-            updateWorkModeUI();
-            carregarRegistrosMes();
-            atualizarDashboard();
-            updateCurrentPeriodDisplay();
-        }
-
-        function showAdminScreen() {
-            document.getElementById('loginScreen').classList.add('hidden');
-            document.getElementById('appScreen').classList.add('hidden');
-            document.getElementById('adminScreen').classList.remove('hidden');
-            
-            loadUsersList();
-        }
-
-        function showLoginForm() {
-            document.getElementById('loginForm').classList.remove('hidden');
-            document.getElementById('registerForm').classList.add('hidden');
-        }
-
-        function showRegisterForm() {
-            document.getElementById('loginForm').classList.add('hidden');
-            document.getElementById('registerForm').classList.remove('hidden');
-        }
-
-        function showConfigModal() {
-            document.getElementById('configModal').classList.remove('hidden');
-            document.getElementById('jsonBinApiKey').value = jsonBinConfig.apiKey;
-            document.getElementById('jsonBinId').value = jsonBinConfig.binId;
-        }
-
-        function closeConfigModal() {
-            document.getElementById('configModal').classList.add('hidden');
-        }
-
-        // =============================================
-        // FUNÇÕES DO JSONBIN
-        // =============================================
-        async function loadAllUsersData() {
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${jsonBinConfig.binId}/latest`, {
-                    headers: {
-                        'X-Master-Key': jsonBinConfig.apiKey
+            // Atualizar resumo
+            atualizarResumo: () => {
+                const periodoAtual = stateManager.obterPeriodoAtual();
+                const registrosPeriodo = state.registros.filter(registro => {
+                    const dataRegistro = new Date(registro.data);
+                    return dataRegistro >= periodoAtual.inicio && dataRegistro <= periodoAtual.fim;
+                });
+                
+                // Calcular totais
+                let totalMinutos = 0;
+                
+                registrosPeriodo.forEach(registro => {
+                    totalMinutos += utils.calcularHorasDia(registro);
+                });
+                
+                // Calcular salário
+                let salario = 0;
+                
+                if (state.modoTrabalho === 'horista') {
+                    // Horista: valor por hora * total de horas
+                    salario = (totalMinutos / 60) * state.valorHoraAula;
+                } else {
+                    // Mensalista: salário fixo + compensação de horas extras
+                    const cargaHorariaMensal = parseFloat(elementos.cargaHorariaMensal.value) || 160;
+                    const salarioMensal = parseFloat(elementos.salarioMensal.value) || 3000;
+                    const valorHora = salarioMensal / cargaHorariaMensal;
+                    
+                    const horasTrabalhadas = totalMinutos / 60;
+                    const diferencaHoras = horasTrabalhadas - cargaHorariaMensal;
+                    
+                    if (diferencaHoras > 0) {
+                        // Horas extras
+                        salario = salarioMensal + (diferencaHoras * valorHora * (1 + state.valorHoraExtra / 100));
+                    } else if (diferencaHoras < 0) {
+                        // Horas faltantes (desconto)
+                        salario = salarioMensal + (diferencaHoras * valorHora);
+                    } else {
+                        salario = salarioMensal;
+                    }
+                }
+                
+                // Aplicar descontos
+                state.descontos.forEach(desconto => {
+                    salario -= desconto.valor;
+                });
+                
+                // Atualizar elementos
+                elementos.resumoHorasTrabalhadas.textContent = utils.minutosParaHoras(totalMinutos);
+                elementos.resumoSalarioBruto.textContent = utils.formatarMoeda(Math.max(0, salario));
+                
+                // Atualizar informações de salário
+                elementos.infoTotalHoras.textContent = utils.minutosParaHoras(totalMinutos);
+                elementos.infoValorHora.textContent = utils.formatarMoeda(state.valorHoraAula);
+                elementos.infoSalarioBruto.textContent = utils.formatarMoeda(Math.max(0, salario));
+                
+                // Calcular horas extras
+                let totalMinutosExtras = 0;
+                registrosPeriodo.forEach(registro => {
+                    const minutosDia = utils.calcularHorasDia(registro);
+                    if (minutosDia > 8 * 60) {
+                        totalMinutosExtras += minutosDia - (8 * 60);
                     }
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Erro ao carregar dados');
-                }
+                elementos.infoHorasExtras.textContent = utils.minutosParaHoras(totalMinutosExtras);
                 
-                const data = await response.json();
-                usersData = data.record || {};
+                // Atualizar gráficos
+                stateManager.atualizarGraficos(registrosPeriodo);
+            },
+            
+            // Atualizar gráficos
+            atualizarGraficos: (registrosPeriodo) => {
+                // Preparar dados para o gráfico de horas por dia
+                const datas = [];
+                const horas = [];
                 
-                // Se não houver dados de admin, criar um padrão
-                if (!usersData.admin) {
-                    usersData.admin = {
-                        password: 'admin123',
-                        registros: [],
-                        settings: {}
-                    };
-                    await saveAllUsersData();
-                }
-                
-                return usersData;
-            } catch (error) {
-                console.error('Erro ao carregar dados:', error);
-                
-                // Se não conseguir carregar, mostrar modal de configuração
-                if (error.message.includes('404') || error.message.includes('403')) {
-                    showConfigModal();
-                } else {
-                    showToast('Erro ao carregar dados. Verifique sua conexão.', 'error');
-                }
-                
-                return {};
-            }
-        }
-
-        async function saveAllUsersData() {
-            try {
-                const response = await fetch(`https://api.jsonbin.io/v3/b/${jsonBinConfig.binId}`, {
-                    method: 'PUT',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'X-Master-Key': jsonBinConfig.apiKey
-                    },
-                    body: JSON.stringify(usersData)
+                registrosPeriodo.forEach(registro => {
+                    datas.push(utils.formatarData(registro.data));
+                    horas.push(utils.calcularHorasDia(registro) / 60); // Converter para horas
                 });
                 
-                if (!response.ok) {
-                    throw new Error('Erro ao salvar dados');
+                // Gráfico de horas por dia
+                const horasCtx = document.getElementById('horasChart').getContext('2d');
+                
+                // Destruir gráfico anterior se existir
+                if (window.horasChart) {
+                    window.horasChart.destroy();
                 }
                 
-                return true;
-            } catch (error) {
-                console.error('Erro ao salvar dados:', error);
-                showToast('Erro ao salvar dados. Verifique sua conexão.', 'error');
-                return false;
-            }
-        }
-
-        function saveJsonBinConfig() {
-            const apiKey = document.getElementById('jsonBinApiKey').value;
-            const binId = document.getElementById('jsonBinId').value;
-            
-            if (!apiKey || !binId) {
-                showToast('Preencha todos os campos', 'error');
-                return;
-            }
-            
-            jsonBinConfig = { apiKey, binId };
-            localStorage.setItem('jsonBinConfig', JSON.stringify(jsonBinConfig));
-            
-            closeConfigModal();
-            showToast('Configuração salva com sucesso!', 'success');
-            
-            // Recarregar dados
-            if (currentUser) {
-                if (currentUser.username === 'admin') {
-                    loadUsersList();
-                } else {
-                    loadUserData();
-                }
-            }
-        }
-
-        // =============================================
-        // FUNÇÕES DE DADOS DO USUÁRIO
-        // =============================================
-        async function loadUserData() {
-            try {
-                await loadAllUsersData();
-                
-                if (usersData[currentUser.username]) {
-                    const userData = usersData[currentUser.username];
-                    registros = userData.registros || [];
-                    
-                    // Carregar configurações
-                    if (userData.settings) {
-                        document.getElementById('valorHoraAula').value = userData.settings.valorHoraAula || 50.00;
-                        document.getElementById('valorHoraExtra').value = userData.settings.valorHoraExtra || 50;
-                        workMode = userData.settings.workMode || 'horista';
-                        
-                        // Carregar configuração do período de cálculo
-                        if (userData.settings.calculationPeriod) {
-                            calculationPeriod = userData.settings.calculationPeriod;
-                            document.querySelector(`input[name="periodType"][value="${calculationPeriod.customPeriod ? 'custom' : 'standard'}"]`).checked = true;
-                            document.getElementById('periodStartDay').value = calculationPeriod.startDay;
-                            document.getElementById('periodEndDay').value = calculationPeriod.startDay - 1;
-                            document.getElementById('customPeriodConfig').classList.toggle('hidden', !calculationPeriod.customPeriod);
-                        }
-                        
-                        // Atualizar modo de trabalho na UI
-                        document.querySelectorAll('.modern-tab').forEach(tab => {
-                            tab.classList.remove('active');
-                            if (tab.dataset.mode === workMode) {
-                                tab.classList.add('active');
+                window.horasChart = new Chart(horasCtx, {
+                    type: 'bar',
+                    data: {
+                        labels: datas,
+                        datasets: [{
+                            label: 'Horas Trabalhadas',
+                            data: horas,
+                            backgroundColor: 'rgba(59, 130, 246, 0.7)',
+                            borderColor: 'rgba(59, 130, 246, 1)',
+                            borderWidth: 1
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        scales: {
+                            y: {
+                                beginAtZero: true,
+                                title: {
+                                    display: true,
+                                    text: 'Horas'
+                                }
+                            },
+                            x: {
+                                title: {
+                                    display: true,
+                                    text: 'Data'
+                                }
                             }
-                        });
-                        
-                        updateWorkModeUI();
-                        
-                        // Carregar configurações de mensalista
-                        if (userData.settings.mensalistaConfig) {
-                            document.getElementById('cargaHorariaMensal').value = userData.settings.mensalistaConfig.cargaHorariaMensal || 160;
-                            document.getElementById('salarioMensal').value = userData.settings.mensalistaConfig.salarioMensal || 3000.00;
                         }
                     }
-                    
-                    // Carregar descontos
-                    if (userData.descontos) {
-                        loadDescontos(userData.descontos);
+                });
+                
+                // Gráfico de distribuição
+                const distribuicaoCtx = document.getElementById('distribuicaoChart').getContext('2d');
+                
+                // Calcular distribuição
+                let horasNormais = 0;
+                let horasExtras = 0;
+                
+                registrosPeriodo.forEach(registro => {
+                    const minutosDia = utils.calcularHorasDia(registro);
+                    if (minutosDia <= 8 * 60) {
+                        horasNormais += minutosDia / 60;
+                    } else {
+                        horasNormais += 8;
+                        horasExtras += (minutosDia / 60) - 8;
                     }
-                    
-                    showAppScreen();
-                } else {
-                    showToast('Erro ao carregar dados do usuário', 'error');
+                });
+                
+                // Destruir gráfico anterior se existir
+                if (window.distribuicaoChart) {
+                    window.distribuicaoChart.destroy();
                 }
-            } catch (error) {
-                console.error('Erro ao carregar dados do usuário:', error);
-                showToast('Erro ao carregar dados do usuário', 'error');
-            }
-        }
-
-        async function saveUserData() {
-            if (!currentUser || currentUser.username === 'admin') return;
-            
-            try {
-                // Atualizar dados do usuário
-                usersData[currentUser.username] = {
-                    ...usersData[currentUser.username],
-                    password: usersData[currentUser.username].password,
-                    registros: registros,
-                    settings: {
-                        valorHoraAula: parseFloat(document.getElementById('valorHoraAula').value),
-                        valorHoraExtra: parseInt(document.getElementById('valorHoraExtra').value),
-                        workMode: workMode,
-                        calculationPeriod: calculationPeriod, // Salvar configuração do período
-                        mensalistaConfig: {
-                            cargaHorariaMensal: parseInt(document.getElementById('cargaHorariaMensal').value),
-                            salarioMensal: parseFloat(document.getElementById('salarioMensal').value)
-                        }
+                
+                window.distribuicaoChart = new Chart(distribuicaoCtx, {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Horas Normais', 'Horas Extras'],
+                        datasets: [{
+                            data: [horasNormais, horasExtras],
+                            backgroundColor: [
+                                'rgba(59, 130, 246, 0.7)',
+                                'rgba(239, 68, 68, 0.7)'
+                            ],
+                            borderColor: [
+                                'rgba(59, 130, 246, 1)',
+                                'rgba(239, 68, 68, 1)'
+                            ],
+                            borderWidth: 1
+                        }]
                     },
-                    descontos: getDescontos()
-                };
-                
-                // Salvar no JSONBin
-                await saveAllUsersData();
-            } catch (error) {
-                console.error('Erro ao salvar dados do usuário:', error);
-                showToast('Erro ao salvar dados', 'error');
-            }
-        }
-
-        // =============================================
-        // FUNÇÕES DO SISTEMA DE PONTO
-        // =============================================
-        async function handlePontoSubmit(e) {
-            e.preventDefault();
-            
-            const data = document.getElementById('data').value;
-            const entrada = document.getElementById('entrada').value;
-            const saida = document.getElementById('saida').value;
-            const intervaloSaida = document.getElementById('intervaloSaida').value;
-            const intervaloRetorno = document.getElementById('intervaloRetorno').value;
-            const observacoes = document.getElementById('observacoes').value;
-            
-            if (!data || !entrada || !saida) {
-                showToast('Preencha pelo menos data, entrada e saída', 'error');
-                return;
-            }
-            
-            // CORREÇÃO: Garantir que a data seja salva exatamente como informada
-            const dataCorrigida = toISODate(data);
-            
-            // Coletar horários adicionais
-            const horariosAdicionais = [];
-            document.querySelectorAll('.horario-adicional').forEach(div => {
-                const entradaAdd = div.querySelector('.entrada-adicional').value;
-                const saidaAdd = div.querySelector('.saida-adicional').value;
-                
-                if (entradaAdd && saidaAdd) {
-                    horariosAdicionais.push({ entrada: entradaAdd, saida: saidaAdd });
-                }
-            });
-            
-            // Calcular total de horas
-            const totalHoras = calcularHorasTrabalhadas(entrada, saida, intervaloSaida, intervaloRetorno, horariosAdicionais);
-            
-            // Criar registro
-            const registro = {
-                id: Date.now(),
-                data: dataCorrigida, // Usar data corrigida
-                entrada,
-                saida,
-                intervaloSaida: intervaloSaida || '',
-                intervaloRetorno: intervaloRetorno || '',
-                horariosAdicionais,
-                totalHoras,
-                observacoes
-            };
-            
-            // Adicionar aos registros
-            registros.push(registro);
-            
-            // Salvar dados
-            await saveUserData();
-            
-            // Atualizar interface
-            carregarRegistrosMes();
-            atualizarDashboard();
-            limparFormulario();
-            
-            showToast('Registro salvo com sucesso!', 'success');
-        }
-
-        function calcularHorasTrabalhadas(entrada, saida, intervaloSaida, intervaloRetorno, horariosAdicionais = []) {
-            // Converter para minutos
-            function toMinutes(time) {
-                if (!time) return 0;
-                const [hours, minutes] = time.split(':').map(Number);
-                return hours * 60 + minutes;
-            }
-            
-            function toTimeString(minutes) {
-                const hours = Math.floor(minutes / 60);
-                const mins = minutes % 60;
-                return `${hours.toString().padStart(2, '0')}:${mins.toString().padStart(2, '0')}`;
-            }
-            
-            // Calcular horas do período principal
-            let totalMinutes = toMinutes(saida) - toMinutes(entrada);
-            
-            // Subtrair intervalo
-            if (intervaloSaida && intervaloRetorno) {
-                totalMinutes -= (toMinutes(intervaloRetorno) - toMinutes(intervaloSaida));
-            }
-            
-            // Adicionar horários adicionais
-            horariosAdicionais.forEach(horario => {
-                totalMinutes += toMinutes(horario.saida) - toMinutes(horario.entrada);
-            });
-            
-            return toTimeString(totalMinutes);
-        }
-
-        function carregarRegistrosMes() {
-            const tabela = document.getElementById('registrosTabela');
-            tabela.innerHTML = '';
-            
-            // USAR PERÍODO DE CÁLCULO EM VEZ DE MÊS/ANO FIXO
-            const registrosPeriodo = getRegistrosPorPeriodo();
-            
-            // Ordenar por data (mais recente primeiro)
-            registrosPeriodo.sort((a, b) => new Date(b.data) - new Date(a.data));
-            
-            document.getElementById('totalRegistros').textContent = registrosPeriodo.length;
-            
-            if (registrosPeriodo.length === 0) {
-                tabela.innerHTML = '<tr><td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">Nenhum registro encontrado para este período</td></tr>';
-                return;
-            }
-            
-            registrosPeriodo.forEach(registro => {
-                const tr = document.createElement('tr');
-                tr.className = 'time-entry';
-                
-                // USAR FUNÇÃO CORRIGIDA PARA FORMATAR DATA
-                const dataFormatada = toBrazilianDate(registro.data);
-                
-                // Calcular horas extras (se aplicável)
-                const horasExtras = calcularHorasExtras(registro.totalHoras);
-                const temHorasExtras = horasExtras !== '00:00';
-                
-                tr.innerHTML = `
-                    <td class="border border-gray-300 px-4 py-2">${dataFormatada}</td>
-                    <td class="border border-gray-300 px-4 py-2">${registro.entrada}</td>
-                    <td class="border border-gray-300 px-4 py-2">${registro.saida}</td>
-                    <td class="border border-gray-300 px-4 py-2">${registro.intervaloSaida && registro.intervaloRetorno ? `${registro.intervaloSaida} - ${registro.intervaloRetorno}` : '-'}</td>
-                    <td class="border border-gray-300 px-4 py-2 ${temHorasExtras ? 'font-bold text-green-600' : ''}">${registro.totalHoras} ${temHorasExtras ? `(+${horasExtras})` : ''}</td>
-                    <td class="border border-gray-300 px-4 py-2">${registro.observacoes || '-'}</td>
-                    <td class="border border-gray-300 px-4 py-2 no-print">
-                        <button class="btn-primary bg-blue-500 hover:bg-blue-600 text-white px-2 py-1 rounded text-sm mr-1 edit-btn" data-id="${registro.id}">
-                            <i class="fas fa-edit"></i>
-                        </button>
-                        <button class="btn-primary bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-sm delete-btn" data-id="${registro.id}">
-                            <i class="fas fa-trash"></i>
-                        </button>
-                    </td>
-                `;
-                
-                tabela.appendChild(tr);
-            });
-            
-            // Adicionar eventos aos botões de edição e exclusão
-            document.querySelectorAll('.edit-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = parseInt(this.dataset.id);
-                    abrirModalEdicao(id);
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false
+                    }
                 });
-            });
+            },
             
-            document.querySelectorAll('.delete-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const id = parseInt(this.dataset.id);
-                    excluirRegistro(id);
-                });
-            });
-            
-            // Atualizar cálculos
-            atualizarCalculos();
-        }
-
-        function calcularHorasExtras(totalHoras) {
-            // Considerar 8 horas como jornada padrão
-            const [horas, minutos] = totalHoras.split(':').map(Number);
-            const totalMinutos = horas * 60 + minutos;
-            
-            if (totalMinutos <= 8 * 60) {
-                return '00:00';
-            }
-            
-            const extrasMinutos = totalMinutos - (8 * 60);
-            const extrasHoras = Math.floor(extrasMinutos / 60);
-            const extrasMins = extrasMinutos % 60;
-            
-            return `${extrasHoras.toString().padStart(2, '0')}:${extrasMins.toString().padStart(2, '0')}`;
-        }
-
-        async function abrirModalEdicao(id) {
-            const registro = registros.find(r => r.id === id);
-            if (!registro) return;
-            
-            document.getElementById('editId').value = registro.id;
-            document.getElementById('editData').value = registro.data; // Já está no formato correto
-            document.getElementById('editEntrada').value = registro.entrada;
-            document.getElementById('editSaida').value = registro.saida;
-            document.getElementById('editIntervaloSaida').value = registro.intervaloSaida || '';
-            document.getElementById('editIntervaloRetorno').value = registro.intervaloRetorno || '';
-            document.getElementById('editObservacoes').value = registro.observacoes || '';
-            
-            document.getElementById('editModal').classList.remove('hidden');
-        }
-
-        function fecharModalEdicao() {
-            document.getElementById('editModal').classList.add('hidden');
-        }
-
-        async function handleEditSubmit(e) {
-            e.preventDefault();
-            
-            const id = parseInt(document.getElementById('editId').value);
-            const data = document.getElementById('editData').value;
-            const entrada = document.getElementById('editEntrada').value;
-            const saida = document.getElementById('editSaida').value;
-            const intervaloSaida = document.getElementById('editIntervaloSaida').value;
-            const intervaloRetorno = document.getElementById('editIntervaloRetorno').value;
-            const observacoes = document.getElementById('editObservacoes').value;
-            
-            if (!data || !entrada || !saida) {
-                showToast('Preencha pelo menos data, entrada e saída', 'error');
-                return;
-            }
-            
-            // CORREÇÃO: Garantir que a data seja salva exatamente como informada
-            const dataCorrigida = toISODate(data);
-            
-            // Encontrar e atualizar registro
-            const index = registros.findIndex(r => r.id === id);
-            if (index === -1) return;
-            
-            // Recalcular total de horas (mantendo horários adicionais existentes)
-            const horariosAdicionais = registros[index].horariosAdicionais || [];
-            const totalHoras = calcularHorasTrabalhadas(entrada, saida, intervaloSaida, intervaloRetorno, horariosAdicionais);
-            
-            registros[index] = {
-                ...registros[index],
-                data: dataCorrigida, // Usar data corrigida
-                entrada,
-                saida,
-                intervaloSaida: intervaloSaida || '',
-                intervaloRetorno: intervaloRetorno || '',
-                totalHoras,
-                observacoes
-            };
-            
-            // Salvar dados
-            await saveUserData();
-            
-            // Atualizar interface
-            carregarRegistrosMes();
-            atualizarDashboard();
-            fecharModalEdicao();
-            
-            showToast('Registro atualizado com sucesso!', 'success');
-        }
-
-        async function excluirRegistro(id) {
-            if (!confirm('Tem certeza que deseja excluir este registro?')) {
-                return;
-            }
-            
-            registros = registros.filter(r => r.id !== id);
-            
-            // Salvar dados
-            await saveUserData();
-            
-            // Atualizar interface
-            carregarRegistrosMes();
-            atualizarDashboard();
-            
-            showToast('Registro excluído com sucesso!', 'success');
-        }
-
-        function limparFormulario() {
-            document.getElementById('pontoForm').reset();
-            document.getElementById('horariosAdicionais').innerHTML = '';
-            // Restaurar data atual corrigida
-            document.getElementById('data').value = getCurrentBrazilianDate();
-        }
-
-        function adicionarHorario() {
-            const container = document.getElementById('horariosAdicionais');
-            const div = document.createElement('div');
-            div.className = 'horario-adicional grid grid-cols-2 gap-4';
-            div.innerHTML = `
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Entrada:</label>
-                    <input type="time" class="entrada-adicional modern-input">
-                </div>
-                <div>
-                    <label class="block text-sm font-medium text-gray-700 mb-1">Saída:</label>
-                    <input type="time" class="saida-adicional modern-input">
-                </div>
-            `;
-            container.appendChild(div);
-        }
-
-        // =============================================
-        // FUNÇÕES DE CÁLCULO DE SALÁRIO
-        // =============================================
-        function atualizarCalculos() {
-            if (workMode === 'horista') {
-                atualizarCalculosHorista();
-            } else {
-                atualizarCalculosMensalista();
-            }
-        }
-
-        function atualizarCalculosHorista() {
-            // USAR REGISTROS DO PERÍODO EM VEZ DO MÊS
-            const registrosPeriodo = getRegistrosPorPeriodo();
-            
-            // Calcular totais
-            let totalHoras = 0;
-            let totalMinutos = 0;
-            let totalHorasExtras = 0;
-            let totalMinutosExtras = 0;
-            
-            registrosPeriodo.forEach(reg => {
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                totalHoras += horas;
-                totalMinutos += minutos;
+            // Atualizar UI de descontos
+            atualizarDescontosUI: () => {
+                elementos.descontosContainer.innerHTML = '';
                 
-                // Calcular horas extras
-                const horasExtras = calcularHorasExtras(reg.totalHoras);
-                if (horasExtras !== '00:00') {
-                    const [hExtras, mExtras] = horasExtras.split(':').map(Number);
-                    totalHorasExtras += hExtras;
-                    totalMinutosExtras += mExtras;
-                }
-            });
-            
-            // Ajustar minutos (convertendo para horas)
-            totalHoras += Math.floor(totalMinutos / 60);
-            totalMinutos = totalMinutos % 60;
-            
-            totalHorasExtras += Math.floor(totalMinutosExtras / 60);
-            totalMinutosExtras = totalMinutosExtras % 60;
-            
-            const totalHorasFormatado = `${totalHoras.toString().padStart(2, '0')}:${totalMinutos.toString().padStart(2, '0')}`;
-            const totalHorasExtrasFormatado = `${totalHorasExtras.toString().padStart(2, '0')}:${totalMinutosExtras.toString().padStart(2, '0')}`;
-            
-            // Atualizar totais na interface
-            document.getElementById('totalHoras').textContent = totalHorasFormatado;
-            document.getElementById('infoTotalHoras').textContent = `${totalHoras}h ${totalMinutos}min`;
-            document.getElementById('infoHorasExtras').textContent = `${totalHorasExtras}h ${totalMinutosExtras}min`;
-            
-            // Calcular salário
-            const valorHora = parseFloat(document.getElementById('valorHoraAula').value) || 0;
-            const percentualHoraExtra = parseInt(document.getElementById('valorHoraExtra').value) || 0;
-            
-            const valorHoraExtra = valorHora * (1 + percentualHoraExtra / 100);
-            
-            const totalMinutosTrabalhados = totalHoras * 60 + totalMinutos;
-            const totalMinutosExtrasTrabalhados = totalHorasExtras * 60 + totalMinutosExtras;
-            const totalMinutosNormais = totalMinutosTrabalhados - totalMinutosExtrasTrabalhados;
-            
-            const salarioHorasNormais = (totalMinutosNormais / 60) * valorHora;
-            const salarioHorasExtras = (totalMinutosExtrasTrabalhados / 60) * valorHoraExtra;
-            const salarioBruto = salarioHorasNormais + salarioHorasExtras;
-            
-            document.getElementById('infoValorHora').textContent = `R$ ${valorHora.toFixed(2)}`;
-            document.getElementById('infoSalarioBruto').textContent = `R$ ${salarioBruto.toFixed(2)}`;
-            document.getElementById('salarioLiquido').textContent = `R$ ${salarioBruto.toFixed(2)}`;
-            
-            // Atualizar dashboard
-            document.getElementById('dashboardHorasMes').textContent = totalHorasFormatado;
-            document.getElementById('dashboardSalarioMes').textContent = `R$ ${salarioBruto.toFixed(2)}`;
-            document.getElementById('dashboardHorasExtras').textContent = totalHorasExtrasFormatado;
-            
-            // Calcular média semanal
-            const semanasNoPeriodo = Math.ceil(registrosPeriodo.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
-            const mediaHoras = Math.floor(mediaSemanalHoras);
-            const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
-            document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
-            
-            // Atualizar gráficos
-            atualizarGraficos(registrosPeriodo);
-        }
-
-        function atualizarCalculosMensalista() {
-            // USAR REGISTROS DO PERÍODO EM VEZ DO MÊS
-            const registrosPeriodo = getRegistrosPorPeriodo();
-            
-            // Calcular totais
-            let totalHoras = 0;
-            let totalMinutos = 0;
-            
-            registrosPeriodo.forEach(reg => {
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                totalHoras += horas;
-                totalMinutos += minutos;
-            });
-            
-            // Ajustar minutos (convertendo para horas)
-            totalHoras += Math.floor(totalMinutos / 60);
-            totalMinutos = totalMinutos % 60;
-            
-            const totalHorasFormatado = `${totalHoras.toString().padStart(2, '0')}:${totalMinutos.toString().padStart(2, '0')}`;
-            
-            // Atualizar totais na interface
-            document.getElementById('totalHoras').textContent = totalHorasFormatado;
-            document.getElementById('infoTotalHoras').textContent = `${totalHoras}h ${totalMinutos}min`;
-            
-            // Configurações de mensalista
-            const cargaHorariaMensal = parseInt(document.getElementById('cargaHorariaMensal').value) || 160;
-            const salarioMensal = parseFloat(document.getElementById('salarioMensal').value) || 3000.00;
-            
-            // Calcular horas a compensar/pagar
-            const totalMinutosTrabalhados = totalHoras * 60 + totalMinutos;
-            const cargaHorariaMinutos = cargaHorariaMensal * 60;
-            
-            const diferencaMinutos = totalMinutosTrabalhados - cargaHorariaMinutos;
-            const diferencaHoras = Math.floor(Math.abs(diferencaMinutos) / 60);
-            const diferencaMinutosRestantes = Math.abs(diferencaMinutos) % 60;
-            
-            const diferencaFormatada = `${diferencaHoras.toString().padStart(2, '0')}:${diferencaMinutosRestantes.toString().padStart(2, '0')}`;
-            
-            // Calcular valor a compensar/pagar
-            const valorHora = salarioMensal / cargaHorariaMensal;
-            const valorDiferenca = (Math.abs(diferencaMinutos) / 60) * valorHora;
-            
-            // Atualizar interface
-            document.getElementById('horasTrabalhadasMensal').textContent = totalHorasFormatado;
-            
-            if (diferencaMinutos > 0) {
-                // Horas extras
-                document.getElementById('horasCompensar').textContent = `+${diferencaFormatada}`;
-                document.getElementById('horasCompensar').className = 'text-green-600 font-bold';
-                document.getElementById('valorCompensar').textContent = `R$ ${valorDiferenca.toFixed(2)}`;
-                document.getElementById('valorCompensar').className = 'text-green-600 font-bold';
-            } else if (diferencaMinutos < 0) {
-                // Horas faltantes
-                document.getElementById('horasCompensar').textContent = `-${diferencaFormatada}`;
-                document.getElementById('horasCompensar').className = 'text-red-600 font-bold';
-                document.getElementById('valorCompensar').textContent = `-R$ ${valorDiferenca.toFixed(2)}`;
-                document.getElementById('valorCompensar').className = 'text-red-600 font-bold';
-            } else {
-                // Exatamente a carga horária
-                document.getElementById('horasCompensar').textContent = '00:00';
-                document.getElementById('horasCompensar').className = '';
-                document.getElementById('valorCompensar').textContent = 'R$ 0,00';
-                document.getElementById('valorCompensar').className = '';
-            }
-            
-            // Salário líquido é o salário mensal ajustado pela diferença
-            let salarioLiquido = salarioMensal;
-            if (diferencaMinutos > 0) {
-                salarioLiquido += valorDiferenca;
-            } else if (diferencaMinutos < 0) {
-                salarioLiquido -= valorDiferenca;
-            }
-            
-            document.getElementById('salarioLiquido').textContent = `R$ ${salarioLiquido.toFixed(2)}`;
-            
-            // Atualizar dashboard
-            document.getElementById('dashboardHorasMes').textContent = totalHorasFormatado;
-            document.getElementById('dashboardSalarioMes').textContent = `R$ ${salarioLiquido.toFixed(2)}`;
-            document.getElementById('dashboardHorasExtras').textContent = diferencaMinutos > 0 ? `+${diferencaFormatada}` : '00:00';
-            
-            // Calcular média semanal
-            const semanasNoPeriodo = Math.ceil(registrosPeriodo.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
-            const mediaHoras = Math.floor(mediaSemanalHoras);
-            const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
-            document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
-            
-            // Atualizar gráficos
-            atualizarGraficos(registrosPeriodo);
-        }
-
-        function calcularSalarioCompleto() {
-            if (workMode === 'horista') {
-                calcularSalarioHorista();
-            } else {
-                calcularSalarioMensalista();
-            }
-        }
-
-        function calcularSalarioHorista() {
-            // USAR REGISTROS DO PERÍODO
-            const registrosPeriodo = getRegistrosPorPeriodo();
-            
-            // Calcular totais
-            let totalHoras = 0;
-            let totalMinutos = 0;
-            let totalHorasExtras = 0;
-            let totalMinutosExtras = 0;
-            
-            registrosPeriodo.forEach(reg => {
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                totalHoras += horas;
-                totalMinutos += minutos;
-                
-                // Calcular horas extras
-                const horasExtras = calcularHorasExtras(reg.totalHoras);
-                if (horasExtras !== '00:00') {
-                    const [hExtras, mExtras] = horasExtras.split(':').map(Number);
-                    totalHorasExtras += hExtras;
-                    totalMinutosExtras += mExtras;
-                }
-            });
-            
-            // Ajustar minutos
-            totalHoras += Math.floor(totalMinutos / 60);
-            totalMinutos = totalMinutos % 60;
-            
-            totalHorasExtras += Math.floor(totalMinutosExtras / 60);
-            totalMinutosExtras = totalMinutosExtras % 60;
-            
-            // Calcular valores
-            const valorHora = parseFloat(document.getElementById('valorHoraAula').value) || 0;
-            const percentualHoraExtra = parseInt(document.getElementById('valorHoraExtra').value) || 0;
-            const valorHoraExtra = valorHora * (1 + percentualHoraExtra / 100);
-            
-            const totalMinutosTrabalhados = totalHoras * 60 + totalMinutos;
-            const totalMinutosExtrasTrabalhados = totalHorasExtras * 60 + totalMinutosExtras;
-            const totalMinutosNormais = totalMinutosTrabalhados - totalMinutosExtrasTrabalhados;
-            
-            const salarioHorasNormais = (totalMinutosNormais / 60) * valorHora;
-            const salarioHorasExtras = (totalMinutosExtrasTrabalhados / 60) * valorHoraExtra;
-            let salarioBruto = salarioHorasNormais + salarioHorasExtras;
-            
-            // Aplicar descontos
-            const descontos = getDescontos();
-            let totalDescontos = 0;
-            descontos.forEach(desc => {
-                if (desc.tipo === 'valor') {
-                    totalDescontos += parseFloat(desc.valor);
-                } else if (desc.tipo === 'percentual') {
-                    totalDescontos += salarioBruto * (parseFloat(desc.valor) / 100);
-                }
-            });
-            
-            const salarioLiquido = salarioBruto - totalDescontos;
-            
-            // Mostrar resultado
-            const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `
-                <div class="flex justify-between">
-                    <span>Total de Horas:</span>
-                    <span>${totalHoras}h ${totalMinutos}min</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Horas Extras:</span>
-                    <span>${totalHorasExtras}h ${totalMinutosExtras}min</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Valor Hora/Aula:</span>
-                    <span>R$ ${valorHora.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Valor Hora Extra:</span>
-                    <span>R$ ${valorHoraExtra.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between border-t pt-2">
-                    <span>Salário Bruto:</span>
-                    <span>R$ ${salarioBruto.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Descontos:</span>
-                    <span>- R$ ${totalDescontos.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between font-bold border-t pt-2">
-                    <span>Salário Líquido:</span>
-                    <span>R$ ${salarioLiquido.toFixed(2)}</span>
-                </div>
-            `;
-            
-            document.getElementById('resultModal').classList.remove('hidden');
-        }
-
-        function calcularSalarioMensalista() {
-            // USAR REGISTROS DO PERÍODO
-            const registrosPeriodo = getRegistrosPorPeriodo();
-            
-            // Calcular totais
-            let totalHoras = 0;
-            let totalMinutos = 0;
-            
-            registrosPeriodo.forEach(reg => {
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                totalHoras += horas;
-                totalMinutos += minutos;
-            });
-            
-            // Ajustar minutos
-            totalHoras += Math.floor(totalMinutos / 60);
-            totalMinutos = totalMinutos % 60;
-            
-            // Configurações de mensalista
-            const cargaHorariaMensal = parseInt(document.getElementById('cargaHorariaMensal').value) || 160;
-            const salarioMensal = parseFloat(document.getElementById('salarioMensal').value) || 3000.00;
-            
-            // Calcular horas a compensar/pagar
-            const totalMinutosTrabalhados = totalHoras * 60 + totalMinutos;
-            const cargaHorariaMinutos = cargaHorariaMensal * 60;
-            
-            const diferencaMinutos = totalMinutosTrabalhados - cargaHorariaMinutos;
-            const diferencaHoras = Math.floor(Math.abs(diferencaMinutos) / 60);
-            const diferencaMinutosRestantes = Math.abs(diferencaMinutos) % 60;
-            
-            const valorHora = salarioMensal / cargaHorariaMensal;
-            const valorDiferenca = (Math.abs(diferencaMinutos) / 60) * valorHora;
-            
-            let salarioLiquido = salarioMensal;
-            if (diferencaMinutos > 0) {
-                salarioLiquido += valorDiferenca;
-            } else if (diferencaMinutos < 0) {
-                salarioLiquido -= valorDiferenca;
-            }
-            
-            // Aplicar descontos
-            const descontos = getDescontos();
-            let totalDescontos = 0;
-            descontos.forEach(desc => {
-                if (desc.tipo === 'valor') {
-                    totalDescontos += parseFloat(desc.valor);
-                } else if (desc.tipo === 'percentual') {
-                    totalDescontos += salarioLiquido * (parseFloat(desc.valor) / 100);
-                }
-            });
-            
-            salarioLiquido -= totalDescontos;
-            
-            // Mostrar resultado
-            const resultContent = document.getElementById('resultContent');
-            resultContent.innerHTML = `
-                <div class="flex justify-between">
-                    <span>Salário Base:</span>
-                    <span>R$ ${salarioMensal.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Carga Horária:</span>
-                    <span>${cargaHorariaMensal}h</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Horas Trabalhadas:</span>
-                    <span>${totalHoras}h ${totalMinutos}min</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Diferença:</span>
-                    <span>${diferencaMinutos > 0 ? '+' : ''}${diferencaHoras}h ${diferencaMinutosRestantes}min</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Valor da Diferença:</span>
-                    <span>${diferencaMinutos > 0 ? '+' : '-'}R$ ${valorDiferenca.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between border-t pt-2">
-                    <span>Salário Ajustado:</span>
-                    <span>R$ ${(salarioMensal + (diferencaMinutos > 0 ? valorDiferenca : -valorDiferenca)).toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between">
-                    <span>Descontos:</span>
-                    <span>- R$ ${totalDescontos.toFixed(2)}</span>
-                </div>
-                <div class="flex justify-between font-bold border-t pt-2">
-                    <span>Salário Líquido:</span>
-                    <span>R$ ${salarioLiquido.toFixed(2)}</span>
-                </div>
-            `;
-            
-            document.getElementById('resultModal').classList.remove('hidden');
-        }
-
-        function fecharModalResultado() {
-            document.getElementById('resultModal').classList.add('hidden');
-        }
-
-        // =============================================
-        // FUNÇÕES DE DESCONTOS
-        // =============================================
-        function adicionarDesconto() {
-            const container = document.getElementById('descontosContainer');
-            const id = Date.now();
-            const div = document.createElement('div');
-            div.className = 'desconto-item grid grid-cols-1 md:grid-cols-5 gap-2 mb-2';
-            div.innerHTML = `
-                <input type="text" class="modern-input desconto-descricao" placeholder="Descrição">
-                <select class="modern-input desconto-tipo">
-                    <option value="valor">Valor (R$)</option>
-                    <option value="percentual">Percentual (%)</option>
-                </select>
-                <input type="number" class="modern-input desconto-valor" step="0.01" min="0" placeholder="Valor">
-                <button type="button" class="btn-primary bg-red-500 hover:bg-red-600 remover-desconto" data-id="${id}">
-                    <i class="fas fa-times"></i>
-                </button>
-            `;
-            container.appendChild(div);
-            
-            // Adicionar evento de remoção
-            div.querySelector('.remover-desconto').addEventListener('click', function() {
-                div.remove();
-                saveUserData();
-            });
-            
-            // Salvar quando alterar
-            div.querySelectorAll('input, select').forEach(el => {
-                el.addEventListener('change', saveUserData);
-            });
-        }
-
-        function loadDescontos(descontos) {
-            const container = document.getElementById('descontosContainer');
-            container.innerHTML = '';
-            
-            if (descontos && descontos.length > 0) {
-                descontos.forEach(desc => {
+                state.descontos.forEach((desconto, index) => {
                     const div = document.createElement('div');
-                    div.className = 'desconto-item grid grid-cols-1 md:grid-cols-5 gap-2 mb-2';
+                    div.className = 'flex items-center mb-2';
                     div.innerHTML = `
-                        <input type="text" class="modern-input desconto-descricao" placeholder="Descrição" value="${desc.descricao || ''}">
-                        <select class="modern-input desconto-tipo">
-                            <option value="valor" ${desc.tipo === 'valor' ? 'selected' : ''}>Valor (R$)</option>
-                            <option value="percentual" ${desc.tipo === 'percentual' ? 'selected' : ''}>Percentual (%)</option>
-                        </select>
-                        <input type="number" class="modern-input desconto-valor" step="0.01" min="0" placeholder="Valor" value="${desc.valor || ''}">
-                        <button type="button" class="btn-primary bg-red-500 hover:bg-red-600 remover-desconto">
+                        <input type="text" class="modern-input flex-1 mr-2" value="${desconto.descricao}" 
+                               placeholder="Descrição do desconto" data-index="${index}">
+                        <input type="number" class="modern-input w-24 mr-2" step="0.01" min="0" 
+                               value="${desconto.valor}" placeholder="Valor" data-index="${index}">
+                        <button class="btn-primary bg-red-500 hover:bg-red-600 remover-desconto" data-index="${index}">
                             <i class="fas fa-times"></i>
                         </button>
                     `;
-                    container.appendChild(div);
                     
-                    // Adicionar evento de remoção
-                    div.querySelector('.remover-desconto').addEventListener('click', function() {
-                        div.remove();
-                        saveUserData();
-                    });
-                    
-                    // Salvar quando alterar
-                    div.querySelectorAll('input, select').forEach(el => {
-                        el.addEventListener('change', saveUserData);
+                    elementos.descontosContainer.appendChild(div);
+                });
+                
+                // Adicionar event listeners para os inputs de desconto
+                document.querySelectorAll('.descontosContainer input').forEach(input => {
+                    input.addEventListener('change', (e) => {
+                        const index = parseInt(e.target.dataset.index);
+                        if (e.target.type === 'text') {
+                            state.descontos[index].descricao = e.target.value;
+                        } else {
+                            state.descontos[index].valor = parseFloat(e.target.value) || 0;
+                        }
+                        stateManager.salvarEstado();
+                        stateManager.atualizarResumo();
                     });
                 });
-            }
-        }
-
-        function getDescontos() {
-            const descontos = [];
-            document.querySelectorAll('.desconto-item').forEach(item => {
-                const descricao = item.querySelector('.desconto-descricao').value;
-                const tipo = item.querySelector('.desconto-tipo').value;
-                const valor = item.querySelector('.desconto-valor').value;
                 
-                if (descricao && valor) {
-                    descontos.push({
-                        descricao,
-                        tipo,
-                        valor: parseFloat(valor)
+                // Adicionar event listeners para os botões de remover
+                document.querySelectorAll('.remover-desconto').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const index = parseInt(e.target.closest('.remover-desconto').dataset.index);
+                        state.descontos.splice(index, 1);
+                        stateManager.salvarEstado();
+                        stateManager.atualizarUI();
                     });
-                }
-            });
-            return descontos;
-        }
-
-        // =============================================
-        // FUNÇÕES DE GRÁFICOS
-        // =============================================
-        function atualizarGraficos(registrosPeriodo) {
-            atualizarGraficoHorasSemanais(registrosPeriodo);
-            atualizarGraficoHorasDiarias(registrosPeriodo);
-        }
-
-        function atualizarGraficoHorasSemanais(registrosPeriodo) {
-            const ctx = document.getElementById('horasSemanaisChart').getContext('2d');
+                });
+            },
             
-            // Agrupar por semana
-            const semanas = {};
-            registrosPeriodo.forEach(reg => {
-                const data = new Date(reg.data);
-                // Obter número da semana no mês
-                const firstDay = new Date(data.getFullYear(), data.getMonth(), 1);
-                const firstDayWeekday = firstDay.getDay();
-                const offsetDate = data.getDate() + firstDayWeekday - 1;
-                const semana = Math.floor(offsetDate / 7) + 1;
+            // Calcular valores para mensalista
+            calcularMensalista: () => {
+                const periodoAtual = stateManager.obterPeriodoAtual();
+                const registrosPeriodo = state.registros.filter(registro => {
+                    const dataRegistro = new Date(registro.data);
+                    return dataRegistro >= periodoAtual.inicio && dataRegistro <= periodoAtual.fim;
+                });
                 
-                if (!semanas[semana]) {
-                    semanas[semana] = 0;
+                // Calcular total de horas trabalhadas
+                let totalMinutos = 0;
+                registrosPeriodo.forEach(registro => {
+                    totalMinutos += utils.calcularHorasDia(registro);
+                });
+                
+                const horasTrabalhadas = totalMinutos / 60;
+                elementos.horasTrabalhadasMensal.textContent = utils.minutosParaHoras(totalMinutos);
+                
+                // Calcular horas a compensar/pagar
+                const cargaHorariaMensal = parseFloat(elementos.cargaHorariaMensal.value) || 160;
+                const salarioMensal = parseFloat(elementos.salarioMensal.value) || 3000;
+                const valorHora = salarioMensal / cargaHorariaMensal;
+                
+                const diferencaHoras = horasTrabalhadas - cargaHorariaMensal;
+                elementos.horasCompensar.textContent = utils.minutosParaHoras(Math.abs(diferencaHoras) * 60);
+                
+                // Calcular valor a compensar/pagar
+                let valorCompensar = 0;
+                if (diferencaHoras > 0) {
+                    // Horas extras
+                    valorCompensar = diferencaHoras * valorHora * (1 + state.valorHoraExtra / 100);
+                } else if (diferencaHoras < 0) {
+                    // Horas faltantes
+                    valorCompensar = diferencaHoras * valorHora;
                 }
                 
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                semanas[semana] += horas + (minutos / 60);
-            });
+                elementos.valorCompensar.textContent = utils.formatarMoeda(valorCompensar);
+            },
             
-            // Preparar dados para o gráfico
-            const labels = Object.keys(semanas).map(s => `Semana ${s}`);
-            const data = Object.values(semanas);
+            // Obter período atual de cálculo
+            obterPeriodoAtual: () => {
+                const hoje = new Date();
+                const ano = hoje.getFullYear();
+                const mes = hoje.getMonth();
+                
+                let inicio, fim;
+                
+                if (state.periodoCalculo.tipo === 'standard') {
+                    // Período padrão: 16 do mês atual a 15 do próximo mês
+                    inicio = new Date(ano, mes, 16);
+                    fim = new Date(ano, mes + 1, 15);
+                } else {
+                    // Período personalizado
+                    inicio = new Date(ano, mes, state.periodoCalculo.diaInicio);
+                    fim = new Date(ano, mes + 1, state.periodoCalculo.diaFim);
+                }
+                
+                // Ajustar se hoje estiver antes do início do período
+                if (hoje < inicio) {
+                    inicio = new Date(ano, mes - 1, state.periodoCalculo.diaInicio);
+                    fim = new Date(ano, mes, state.periodoCalculo.diaFim);
+                }
+                
+                return { inicio, fim };
+            },
             
-            // Destruir gráfico existente se houver
-            if (window.horasSemanaisChartInstance) {
-                window.horasSemanaisChartInstance.destroy();
+            // Adicionar registro
+            adicionarRegistro: (dados) => {
+                const novoRegistro = {
+                    id: utils.gerarId(),
+                    data: dados.data,
+                    entrada: dados.entrada,
+                    saida: dados.saida,
+                    intervaloSaida: dados.intervaloSaida,
+                    intervaloRetorno: dados.intervaloRetorno,
+                    horariosAdicionais: dados.horariosAdicionais || [],
+                    observacoes: dados.observacoes
+                };
+                
+                state.registros.push(novoRegistro);
+                stateManager.salvarEstado();
+                stateManager.atualizarUI();
+                
+                utils.mostrarToast('Registro adicionado com sucesso!');
+            },
+            
+            // Editar registro
+            editarRegistro: (id) => {
+                const registro = state.registros.find(r => r.id === id);
+                if (!registro) return;
+                
+                // Preencher formulário de edição
+                elementos.editarId.value = registro.id;
+                elementos.editarData.value = registro.data;
+                elementos.editarEntrada.value = registro.entrada || '';
+                elementos.editarSaida.value = registro.saida || '';
+                elementos.editarIntervaloSaida.value = registro.intervaloSaida || '';
+                elementos.editarIntervaloRetorno.value = registro.intervaloRetorno || '';
+                elementos.editarObservacoes.value = registro.observacoes || '';
+                
+                // Mostrar modal
+                elementos.editarModal.classList.remove('hidden');
+            },
+            
+            // Salvar edição de registro
+            salvarEdicaoRegistro: (dados) => {
+                const index = state.registros.findIndex(r => r.id === dados.id);
+                if (index === -1) return;
+                
+                state.registros[index] = {
+                    ...state.registros[index],
+                    data: dados.data,
+                    entrada: dados.entrada,
+                    saida: dados.saida,
+                    intervaloSaida: dados.intervaloSaida,
+                    intervaloRetorno: dados.intervaloRetorno,
+                    observacoes: dados.observacoes
+                };
+                
+                stateManager.salvarEstado();
+                stateManager.atualizarUI();
+                
+                utils.mostrarToast('Registro atualizado com sucesso!');
+            },
+            
+            // Excluir registro
+            excluirRegistro: (id) => {
+                if (!confirm('Tem certeza que deseja excluir este registro?')) {
+                    return;
+                }
+                
+                state.registros = state.registros.filter(r => r.id !== id);
+                stateManager.salvarEstado();
+                stateManager.atualizarUI();
+                
+                utils.mostrarToast('Registro excluído com sucesso!');
             }
+        };
+
+        // Funções de autenticação
+        const auth = {
+            // Fazer login
+            login: async (usuario, senha) => {
+                // Verificar se é admin
+                if (usuario === 'admin' && senha === 'admin123') {
+                    state.usuarioAtual = { usuario: 'admin' };
+                    state.admin = true;
+                    auth.mostrarTelaAdmin();
+                    utils.mostrarToast('Login admin realizado com sucesso!');
+                    return true;
+                }
+                
+                // Verificar usuários normais
+                const usuarioEncontrado = state.usuarios.find(u => u.usuario === usuario && u.senha === senha);
+                
+                if (usuarioEncontrado) {
+                    state.usuarioAtual = usuarioEncontrado;
+                    state.admin = false;
+                    auth.mostrarTelaApp();
+                    utils.mostrarToast(`Bem-vindo, ${usuario}!`);
+                    return true;
+                }
+                
+                return false;
+            },
             
-            // Criar novo gráfico
-            window.horasSemanaisChartInstance = new Chart(ctx, {
-                type: 'bar',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Horas Trabalhadas',
-                        data: data,
-                        backgroundColor: 'rgba(59, 130, 246, 0.7)',
-                        borderColor: 'rgba(59, 130, 246, 1)',
-                        borderWidth: 1
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Horas'
-                            }
-                        }
+            // Registrar novo usuário
+            registrar: (usuario, senha) => {
+                // Verificar se usuário já existe
+                if (state.usuarios.find(u => u.usuario === usuario)) {
+                    return { sucesso: false, mensagem: 'Usuário já existe!' };
+                }
+                
+                // Adicionar novo usuário
+                const novoUsuario = {
+                    usuario,
+                    senha,
+                    dataCriacao: new Date().toISOString()
+                };
+                
+                state.usuarios.push(novoUsuario);
+                stateManager.salvarEstado();
+                
+                return { sucesso: true, mensagem: 'Usuário criado com sucesso!' };
+            },
+            
+            // Mostrar tela do app
+            mostrarTelaApp: () => {
+                elementos.loginScreen.classList.add('hidden');
+                elementos.adminScreen.classList.add('hidden');
+                elementos.appScreen.classList.remove('hidden');
+                
+                elementos.userWelcome.textContent = state.usuarioAtual.usuario;
+                
+                // Carregar dados
+                stateManager.carregarEstado();
+            },
+            
+            // Mostrar tela de admin
+            mostrarTelaAdmin: () => {
+                elementos.loginScreen.classList.add('hidden');
+                elementos.appScreen.classList.add('hidden');
+                elementos.adminScreen.classList.remove('hidden');
+                
+                // Carregar lista de usuários
+                auth.carregarListaUsuarios();
+            },
+            
+            // Mostrar tela de login
+            mostrarTelaLogin: () => {
+                elementos.appScreen.classList.add('hidden');
+                elementos.adminScreen.classList.add('hidden');
+                elementos.loginScreen.classList.remove('hidden');
+                
+                // Limpar formulários
+                elementos.loginForm.reset();
+                elementos.registerForm.reset();
+                elementos.loginForm.classList.remove('hidden');
+                elementos.registerForm.classList.add('hidden');
+                
+                state.usuarioAtual = null;
+                state.admin = false;
+            },
+            
+            // Carregar lista de usuários (admin)
+            carregarListaUsuarios: () => {
+                elementos.usersList.innerHTML = '';
+                
+                if (state.usuarios.length === 0) {
+                    elementos.usersList.innerHTML = `
+                        <tr>
+                            <td colspan="2" class="border border-gray-300 px-4 py-2 text-center text-gray-500">
+                                Nenhum usuário cadastrado.
+                            </td>
+                        </tr>
+                    `;
+                    return;
+                }
+                
+                state.usuarios.forEach(usuario => {
+                    const tr = document.createElement('tr');
+                    tr.innerHTML = `
+                        <td class="border border-gray-300 px-4 py-2">${usuario.usuario}</td>
+                        <td class="border border-gray-300 px-4 py-2">
+                            <button class="btn-primary bg-red-500 hover:bg-red-600 text-sm excluir-usuario" data-user="${usuario.usuario}">
+                                <i class="fas fa-trash"></i> Excluir
+                            </button>
+                        </td>
+                    `;
+                    
+                    elementos.usersList.appendChild(tr);
+                });
+                
+                // Adicionar event listeners para os botões de excluir
+                document.querySelectorAll('.excluir-usuario').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        const usuario = e.target.closest('.excluir-usuario').dataset.user;
+                        auth.excluirUsuario(usuario);
+                    });
+                });
+            },
+            
+            // Excluir usuário (admin)
+            excluirUsuario: (usuario) => {
+                if (!confirm(`Tem certeza que deseja excluir o usuário "${usuario}"?`)) {
+                    return;
+                }
+                
+                state.usuarios = state.usuarios.filter(u => u.usuario !== usuario);
+                stateManager.salvarEstado();
+                auth.carregarListaUsuarios();
+                
+                utils.mostrarToast(`Usuário "${usuario}" excluído com sucesso!`);
+            },
+            
+            // Alterar senha do admin
+            alterarSenhaAdmin: (senhaAtual, novaSenha, confirmacao) => {
+                // Verificar senha atual
+                if (senhaAtual !== 'admin123') {
+                    return { sucesso: false, mensagem: 'Senha atual incorreta!' };
+                }
+                
+                // Verificar se as novas senhas coincidem
+                if (novaSenha !== confirmacao) {
+                    return { sucesso: false, mensagem: 'As novas senhas não coincidem!' };
+                }
+                
+                // Em uma aplicação real, aqui salvaríamos a nova senha
+                // Por simplicidade, vamos apenas mostrar uma mensagem
+                return { 
+                    sucesso: true, 
+                    mensagem: 'Senha alterada com sucesso! (Em uma aplicação real, a senha seria salva)' 
+                };
+            },
+            
+            // Criar novo usuário (admin)
+            criarUsuario: (usuario, senha, confirmacao) => {
+                // Verificar se usuário já existe
+                if (state.usuarios.find(u => u.usuario === usuario)) {
+                    return { sucesso: false, mensagem: 'Usuário já existe!' };
+                }
+                
+                // Verificar se as senhas coincidem
+                if (senha !== confirmacao) {
+                    return { sucesso: false, mensagem: 'As senhas não coincidem!' };
+                }
+                
+                // Adicionar novo usuário
+                const novoUsuario = {
+                    usuario,
+                    senha,
+                    dataCriacao: new Date().toISOString()
+                };
+                
+                state.usuarios.push(novoUsuario);
+                stateManager.salvarEstado();
+                
+                return { sucesso: true, mensagem: 'Usuário criado com sucesso!' };
+            }
+        };
+
+        // Inicialização da aplicação
+        const init = () => {
+            // Configurar data atual no formulário
+            elementos.data.value = utils.dataAtual();
+            
+            // Configurar event listeners
+            
+            // Login/Registro
+            elementos.loginBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                const usuario = elementos.loginUsername.value.trim();
+                const senha = elementos.loginPassword.value;
+                
+                if (!usuario || !senha) {
+                    utils.mostrarToast('Preencha todos os campos!', 'error');
+                    return;
+                }
+                
+                elementos.loginText.textContent = 'Entrando...';
+                elementos.loginLoading.classList.remove('hidden');
+                
+                // Simular delay de rede
+                setTimeout(async () => {
+                    const sucesso = await auth.login(usuario, senha);
+                    
+                    elementos.loginText.textContent = 'Entrar';
+                    elementos.loginLoading.classList.add('hidden');
+                    
+                    if (!sucesso) {
+                        utils.mostrarToast('Usuário ou senha incorretos!', 'error');
                     }
+                }, 1000);
+            });
+            
+            elementos.registerBtn.addEventListener('click', async (e) => {
+                e.preventDefault();
+                
+                const usuario = elementos.registerUsername.value.trim();
+                const senha = elementos.registerPassword.value;
+                const confirmacao = elementos.confirmPassword.value;
+                
+                if (!usuario || !senha || !confirmacao) {
+                    utils.mostrarToast('Preencha todos os campos!', 'error');
+                    return;
                 }
-            });
-        }
-
-        function atualizarGraficoHorasDiarias(registrosPeriodo) {
-            const ctx = document.getElementById('horasDiariasChart').getContext('2d');
-            
-            // Ordenar registros por data
-            registrosPeriodo.sort((a, b) => new Date(a.data) - new Date(b.data));
-            
-            // Preparar dados para o gráfico
-            const labels = registrosPeriodo.map(reg => {
-                const data = new Date(reg.data);
-                return data.getDate().toString().padStart(2, '0') + '/' + (data.getMonth() + 1).toString().padStart(2, '0');
-            });
-            
-            const data = registrosPeriodo.map(reg => {
-                const [horas, minutos] = reg.totalHoras.split(':').map(Number);
-                return horas + (minutos / 60);
-            });
-            
-            // Destruir gráfico existente se houver
-            if (window.horasDiariasChartInstance) {
-                window.horasDiariasChartInstance.destroy();
-            }
-            
-            // Criar novo gráfico
-            window.horasDiariasChartInstance = new Chart(ctx, {
-                type: 'line',
-                data: {
-                    labels: labels,
-                    datasets: [{
-                        label: 'Horas por Dia',
-                        data: data,
-                        backgroundColor: 'rgba(16, 185, 129, 0.2)',
-                        borderColor: 'rgba(16, 185, 129, 1)',
-                        borderWidth: 2,
-                        tension: 0.3,
-                        fill: true
-                    }]
-                },
-                options: {
-                    responsive: true,
-                    scales: {
-                        y: {
-                            beginAtZero: true,
-                            title: {
-                                display: true,
-                                text: 'Horas'
-                            }
-                        }
+                
+                if (senha !== confirmacao) {
+                    utils.mostrarToast('As senhas não coincidem!', 'error');
+                    return;
+                }
+                
+                elementos.registerText.textContent = 'Cadastrando...';
+                elementos.registerLoading.classList.remove('hidden');
+                
+                // Simular delay de rede
+                setTimeout(() => {
+                    const resultado = auth.registrar(usuario, senha);
+                    
+                    elementos.registerText.textContent = 'Cadastrar';
+                    elementos.registerLoading.classList.add('hidden');
+                    
+                    if (resultado.sucesso) {
+                        utils.mostrarToast(resultado.mensagem);
+                        elementos.showLogin.click();
+                    } else {
+                        utils.mostrarToast(resultado.mensagem, 'error');
                     }
+                }, 1000);
+            });
+            
+            elementos.showRegister.addEventListener('click', (e) => {
+                e.preventDefault();
+                elementos.loginForm.classList.add('hidden');
+                elementos.registerForm.classList.remove('hidden');
+            });
+            
+            elementos.showLogin.addEventListener('click', (e) => {
+                e.preventDefault();
+                elementos.registerForm.classList.add('hidden');
+                elementos.loginForm.classList.remove('hidden');
+            });
+            
+            // Logout
+            elementos.logoutBtn.addEventListener('click', () => {
+                auth.mostrarTelaLogin();
+            });
+            
+            elementos.adminLogoutBtn.addEventListener('click', () => {
+                auth.mostrarTelaLogin();
+            });
+            
+            // Modo escuro
+            elementos.darkModeToggle.addEventListener('click', () => {
+                document.body.classList.toggle('dark-mode');
+                if (document.body.classList.contains('dark-mode')) {
+                    elementos.darkModeToggle.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
+                } else {
+                    elementos.darkModeToggle.innerHTML = '<i class="fas fa-moon"></i> Modo Escuro';
                 }
             });
-        }
-
-        // =============================================
-        // FUNÇÕES DE DASHBOARD
-        // =============================================
-        function atualizarDashboard() {
-            // Esta função é chamada por atualizarCalculos()
-            // Os valores são atualizados lá
-        }
-
-        // =============================================
-        // FUNÇÕES DE NAVEGAÇÃO
-        // =============================================
-        function initializeYearSelect() {
-            const select = document.getElementById('yearSelect');
-            const currentYear = new Date().getFullYear();
             
-            // Adicionar opções para os últimos 5 anos e próximos 2
-            for (let i = currentYear - 5; i <= currentYear + 2; i++) {
-                const option = document.createElement('option');
-                option.value = i;
-                option.textContent = i;
-                if (i === currentYear) {
-                    option.selected = true;
-                }
-                select.appendChild(option);
-            }
-        }
-
-        function updateMonthTabs() {
-            document.querySelectorAll('.month-tab').forEach(tab => {
-                tab.classList.remove('tab-active', 'bg-blue-100', 'text-blue-800');
+            // Exportar/Importar
+            elementos.exportBtn.addEventListener('click', () => {
+                const dados = {
+                    registros: state.registros,
+                    configuracoes: {
+                        modoTrabalho: state.modoTrabalho,
+                        periodoCalculo: state.periodoCalculo,
+                        valorHoraAula: state.valorHoraAula,
+                        valorHoraExtra: state.valorHoraExtra,
+                        descontos: state.descontos
+                    }
+                };
                 
-                if (parseInt(tab.dataset.month) === currentMonth) {
-                    tab.classList.add('tab-active', 'bg-blue-100', 'text-blue-800');
-                }
+                const blob = new Blob([JSON.stringify(dados, null, 2)], { type: 'application/json' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = `controle-ponto-${utils.dataAtual()}.json`;
+                a.click();
+                URL.revokeObjectURL(url);
                 
-                tab.addEventListener('click', function() {
-                    currentMonth = parseInt(this.dataset.month);
-                    updateMonthTabs();
-                    carregarRegistrosMes();
+                utils.mostrarToast('Dados exportados com sucesso!');
+            });
+            
+            elementos.importBtn.addEventListener('click', () => {
+                elementos.importFile.click();
+            });
+            
+            elementos.importFile.addEventListener('change', (e) => {
+                const file = e.target.files[0];
+                if (!file) return;
+                
+                const reader = new FileReader();
+                reader.onload = (event) => {
+                    try {
+                        const dados = JSON.parse(event.target.result);
+                        
+                        if (dados.registros) {
+                            state.registros = dados.registros;
+                        }
+                        
+                        if (dados.configuracoes) {
+                            state.modoTrabalho = dados.configuracoes.modoTrabalho || state.modoTrabalho;
+                            state.periodoCalculo = dados.configuracoes.periodoCalculo || state.periodoCalculo;
+                            state.valorHoraAula = dados.configuracoes.valorHoraAula || state.valorHoraAula;
+                            state.valorHoraExtra = dados.configuracoes.valorHoraExtra || state.valorHoraExtra;
+                            state.descontos = dados.configuracoes.descontos || state.descontos;
+                        }
+                        
+                        stateManager.salvarEstado();
+                        stateManager.atualizarUI();
+                        
+                        utils.mostrarToast('Dados importados com sucesso!');
+                    } catch (error) {
+                        console.error('Erro ao importar dados:', error);
+                        utils.mostrarToast('Erro ao importar dados. Verifique o arquivo.', 'error');
+                    }
+                };
+                reader.readAsText(file);
+                
+                // Limpar input
+                elementos.importFile.value = '';
+            });
+            
+            // Modo de trabalho
+            document.querySelectorAll('.modern-tab').forEach(tab => {
+                tab.addEventListener('click', () => {
+                    state.modoTrabalho = tab.dataset.mode;
+                    stateManager.atualizarModoTrabalhoUI();
+                    stateManager.salvarEstado();
                 });
             });
-        }
-
-        // =============================================
-        // FUNÇÕES DE MODO DE TRABALHO
-        // =============================================
-        function updateWorkModeUI() {
-            const indicator = document.getElementById('workModeIndicator');
-            const mensalistaConfig = document.getElementById('mensalistaConfig');
             
-            if (workMode === 'horista') {
-                indicator.textContent = 'Horista';
-                indicator.className = 'work-mode-indicator work-mode-horista';
-                mensalistaConfig.classList.add('hidden');
-            } else {
-                indicator.textContent = 'Mensalista';
-                indicator.className = 'work-mode-indicator work-mode-mensalista';
-                mensalistaConfig.classList.remove('hidden');
-            }
+            // Configurações de mensalista
+            elementos.cargaHorariaMensal.addEventListener('change', () => {
+                stateManager.calcularMensalista();
+            });
             
-            // Atualizar cálculos
-            atualizarCalculos();
-        }
-
-        function loadMensalistaConfig() {
-            // Esta função é chamada no carregamento dos dados do usuário
-        }
-
-        async function saveMensalistaConfig() {
-            await saveUserData();
-            atualizarCalculos();
-        }
-
-        // =============================================
-        // FUNÇÕES DE ADMINISTRAÇÃO
-        // =============================================
-        function loadUsersList() {
-            const usersList = document.getElementById('usersList');
-            usersList.innerHTML = '';
+            elementos.salarioMensal.addEventListener('change', () => {
+                stateManager.calcularMensalista();
+            });
             
-            Object.keys(usersData).forEach(username => {
-                if (username === 'admin') return;
+            // Período de cálculo
+            elementos.periodTypeRadios.forEach(radio => {
+                radio.addEventListener('change', () => {
+                    state.periodoCalculo.tipo = radio.value;
+                    stateManager.atualizarPeriodoCalculoUI();
+                    stateManager.salvarEstado();
+                });
+            });
+            
+            elementos.periodStartDay.addEventListener('change', () => {
+                state.periodoCalculo.diaInicio = parseInt(elementos.periodStartDay.value) || 16;
+                state.periodoCalculo.diaFim = state.periodoCalculo.diaInicio - 1;
+                if (state.periodoCalculo.diaFim < 1) {
+                    state.periodoCalculo.diaFim = 31;
+                }
+                elementos.periodEndDay.value = state.periodoCalculo.diaFim;
                 
-                const tr = document.createElement('tr');
-                tr.innerHTML = `
-                    <td class="border border-gray-300 px-4 py-2">${username}</td>
-                    <td class="border border-gray-300 px-4 py-2">
-                        <button class="btn-primary bg-red-500 hover:bg-red-600 text-white px-2 py-1 rounded text-sm delete-user-btn" data-username="${username}">
-                            <i class="fas fa-trash"></i> Excluir
-                        </button>
-                    </td>
+                stateManager.atualizarPeriodoCalculoUI();
+                stateManager.salvarEstado();
+            });
+            
+            // Formulário de ponto
+            elementos.pontoForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const dados = {
+                    data: elementos.data.value,
+                    entrada: elementos.entrada.value,
+                    saida: elementos.saida.value,
+                    intervaloSaida: elementos.intervaloSaida.value,
+                    intervaloRetorno: elementos.intervaloRetorno.value,
+                    observacoes: elementos.observacoes.value,
+                    horariosAdicionais: []
+                };
+                
+                // Coletar horários adicionais
+                document.querySelectorAll('.horario-adicional').forEach(horario => {
+                    const entrada = horario.querySelector('.entrada-adicional').value;
+                    const saida = horario.querySelector('.saida-adicional').value;
+                    
+                    if (entrada && saida) {
+                        dados.horariosAdicionais.push({ entrada, saida });
+                    }
+                });
+                
+                stateManager.adicionarRegistro(dados);
+                elementos.pontoForm.reset();
+                elementos.data.value = utils.dataAtual();
+                elementos.horariosAdicionais.innerHTML = '';
+            });
+            
+            elementos.limparForm.addEventListener('click', () => {
+                elementos.pontoForm.reset();
+                elementos.data.value = utils.dataAtual();
+                elementos.horariosAdicionais.innerHTML = '';
+            });
+            
+            elementos.adicionarHorario.addEventListener('click', () => {
+                const div = document.createElement('div');
+                div.className = 'horario-adicional flex items-center gap-2';
+                div.innerHTML = `
+                    <input type="time" class="entrada-adicional modern-input flex-1">
+                    <span>às</span>
+                    <input type="time" class="saida-adicional modern-input flex-1">
+                    <button type="button" class="btn-primary bg-red-500 hover:bg-red-600 remover-horario">
+                        <i class="fas fa-times"></i>
+                    </button>
                 `;
-                usersList.appendChild(tr);
-            });
-            
-            // Adicionar eventos aos botões de exclusão
-            document.querySelectorAll('.delete-user-btn').forEach(btn => {
-                btn.addEventListener('click', function() {
-                    const username = this.dataset.username;
-                    deleteUser(username);
+                
+                elementos.horariosAdicionais.appendChild(div);
+                
+                // Adicionar event listener para o botão de remover
+                div.querySelector('.remover-horario').addEventListener('click', () => {
+                    div.remove();
                 });
             });
-        }
-
-        async function deleteUser(username) {
-            if (!confirm(`Tem certeza que deseja excluir o usuário "${username}"? Todos os dados serão perdidos.`)) {
-                return;
-            }
             
-            delete usersData[username];
-            await saveAllUsersData();
-            loadUsersList();
-            showToast('Usuário excluído com sucesso!', 'success');
-        }
-
-        async function changeAdminPassword() {
-            const currentPassword = document.getElementById('currentPassword').value;
-            const newPassword = document.getElementById('newPassword').value;
-            const confirmNewPassword = document.getElementById('confirmNewPassword').value;
+            // Configurações de salário
+            elementos.valorHoraAula.addEventListener('change', () => {
+                state.valorHoraAula = parseFloat(elementos.valorHoraAula.value) || 50.00;
+                stateManager.salvarEstado();
+                stateManager.atualizarResumo();
+            });
             
-            if (!currentPassword || !newPassword || !confirmNewPassword) {
-                showToast('Preencha todos os campos', 'error');
-                return;
-            }
+            elementos.valorHoraExtra.addEventListener('change', () => {
+                state.valorHoraExtra = parseFloat(elementos.valorHoraExtra.value) || 50;
+                stateManager.salvarEstado();
+                stateManager.atualizarResumo();
+            });
             
-            if (newPassword !== confirmNewPassword) {
-                showToast('As novas senhas não coincidem', 'error');
-                return;
-            }
+            elementos.adicionarDesconto.addEventListener('click', () => {
+                state.descontos.push({
+                    id: utils.gerarId(),
+                    descricao: '',
+                    valor: 0
+                });
+                
+                stateManager.salvarEstado();
+                stateManager.atualizarDescontosUI();
+            });
             
-            if (newPassword.length < 4) {
-                showToast('A nova senha deve ter pelo menos 4 caracteres', 'error');
-                return;
-            }
+            elementos.calcularSalario.addEventListener('click', () => {
+                stateManager.atualizarResumo();
+                utils.mostrarToast('Salário calculado com sucesso!');
+            });
             
-            // Verificar senha atual
-            if (usersData.admin.password !== currentPassword) {
-                showToast('Senha atual incorreta', 'error');
-                return;
-            }
+            // Ações de relatório
+            elementos.imprimirRelatorio.addEventListener('click', () => {
+                window.print();
+            });
             
-            // Atualizar senha
-            usersData.admin.password = newPassword;
-            await saveAllUsersData();
+            elementos.exportarDados.addEventListener('click', () => {
+                elementos.exportBtn.click();
+            });
             
-            // Limpar formulário
-            document.getElementById('currentPassword').value = '';
-            document.getElementById('newPassword').value = '';
-            document.getElementById('confirmNewPassword').value = '';
-            
-            showToast('Senha alterada com sucesso!', 'success');
-        }
-
-        async function createUser() {
-            const username = document.getElementById('newUsername').value;
-            const password = document.getElementById('newUserPassword').value;
-            const confirmPassword = document.getElementById('confirmNewUserPassword').value;
-            
-            if (!username || !password || !confirmPassword) {
-                showToast('Preencha todos os campos', 'error');
-                return;
-            }
-            
-            if (password !== confirmPassword) {
-                showToast('As senhas não coincidem', 'error');
-                return;
-            }
-            
-            if (username.length < 3) {
-                showToast('O usuário deve ter pelo menos 3 caracteres', 'error');
-                return;
-            }
-            
-            if (password.length < 4) {
-                showToast('A senha deve ter pelo menos 4 caracteres', 'error');
-                return;
-            }
-            
-            // Verificar se o usuário já existe
-            if (usersData[username]) {
-                showToast('Este usuário já existe', 'error');
-                return;
-            }
-            
-            // Criar novo usuário
-            usersData[username] = {
-                password: password,
-                registros: [],
-                settings: {
-                    valorHoraAula: 50.00,
-                    valorHoraExtra: 50,
-                    workMode: 'horista',
-                    calculationPeriod: calculationPeriod, // Salvar configuração do período
-                    mensalistaConfig: {
-                        cargaHorariaMensal: 160,
-                        salarioMensal: 3000.00
+            // Filtros
+            elementos.filtrarRegistros.addEventListener('click', () => {
+                // Implementar filtros (simplificado)
+                const mes = prompt('Digite o mês (1-12) para filtrar:');
+                if (mes) {
+                    const mesNum = parseInt(mes);
+                    if (mesNum >= 1 && mesNum <= 12) {
+                        const registrosFiltrados = state.registros.filter(registro => {
+                            const data = new Date(registro.data);
+                            return data.getMonth() + 1 === mesNum;
+                        });
+                        
+                        // Temporariamente substituir registros para exibir apenas os filtrados
+                        const registrosOriginais = state.registros;
+                        state.registros = registrosFiltrados;
+                        stateManager.atualizarTabelaRegistros();
+                        state.registros = registrosOriginais;
+                        
+                        utils.mostrarToast(`Mostrando ${registrosFiltrados.length} registros do mês ${mesNum}`);
+                    } else {
+                        utils.mostrarToast('Mês inválido!', 'error');
                     }
-                },
-                descontos: []
-            };
-            
-            await saveAllUsersData();
-            
-            // Limpar formulário
-            document.getElementById('newUsername').value = '';
-            document.getElementById('newUserPassword').value = '';
-            document.getElementById('confirmNewUserPassword').value = '';
-            
-            // Atualizar lista
-            loadUsersList();
-            
-            showToast('Usuário criado com sucesso!', 'success');
-        }
-
-        // =============================================
-        // FUNÇÕES UTILITÁRIAS
-        // =============================================
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.textContent = message;
-            toast.className = `toast ${type} show`;
-            
-            setTimeout(() => {
-                toast.classList.remove('show');
-            }, 3000);
-        }
-
-        function toggleDarkMode() {
-            document.body.classList.toggle('dark-mode');
-            const button = document.getElementById('darkModeToggle');
-            if (document.body.classList.contains('dark-mode')) {
-                button.innerHTML = '<i class="fas fa-sun"></i> Modo Claro';
-            } else {
-                button.innerHTML = '<i class="fas fa-moon"></i> Modo Escuro';
-            }
-        }
-
-        function imprimirRelatorio() {
-            window.print();
-        }
-
-        function exportarDados() {
-            const dataToExport = {
-                usuario: currentUser.username,
-                registros: registros,
-                settings: usersData[currentUser.username]?.settings || {},
-                descontos: getDescontos(),
-                exportDate: new Date().toISOString()
-            };
-            
-            const dataStr = JSON.stringify(dataToExport, null, 2);
-            const dataBlob = new Blob([dataStr], { type: 'application/json' });
-            
-            const url = URL.createObjectURL(dataBlob);
-            const a = document.createElement('a');
-            a.href = url;
-            a.download = `ponto-${currentUser.username}-${new Date().toISOString().split('T')[0]}.json`;
-            document.body.appendChild(a);
-            a.click();
-            document.body.removeChild(a);
-            URL.revokeObjectURL(url);
-            
-            showToast('Dados exportados com sucesso!', 'success');
-        }
-
-        function importarDados() {
-            const fileInput = document.getElementById('importFile');
-            const file = fileInput.files[0];
-            
-            if (!file) {
-                showToast('Selecione um arquivo para importar', 'error');
-                return;
-            }
-            
-            const reader = new FileReader();
-            reader.onload = function(e) {
-                try {
-                    const importedData = JSON.parse(e.target.result);
-                    
-                    // Verificar se os dados são compatíveis
-                    if (!importedData.registros || !Array.isArray(importedData.registros)) {
-                        showToast('Arquivo inválido: formato não reconhecido', 'error');
-                        return;
-                    }
-                    
-                    if (confirm('Isso substituirá todos os seus registros atuais. Continuar?')) {
-                        // Substituir registros
-                        registros = importedData.registros;
-                        
-                        // Atualizar configurações se existirem
-                        if (importedData.settings) {
-                            usersData[currentUser.username].settings = importedData.settings;
-                        }
-                        
-                        // Atualizar descontos se existirem
-                        if (importedData.descontos) {
-                            loadDescontos(importedData.descontos);
-                        }
-                        
-                        // Salvar dados
-                        saveUserData();
-                        
-                        // Atualizar interface
-                        carregarRegistrosMes();
-                        atualizarDashboard();
-                        
-                        showToast('Dados importados com sucesso!', 'success');
-                    }
-                } catch (error) {
-                    console.error('Erro ao importar dados:', error);
-                    showToast('Erro ao importar dados: arquivo inválido', 'error');
                 }
-            };
+            });
             
-            reader.readAsText(file);
-            fileInput.value = ''; // Limpar seleção
-        }
+            elementos.limparFiltros.addEventListener('click', () => {
+                stateManager.atualizarTabelaRegistros();
+                utils.mostrarToast('Filtros removidos');
+            });
+            
+            // Modal de edição
+            elementos.editarForm.addEventListener('submit', (e) => {
+                e.preventDefault();
+                
+                const dados = {
+                    id: elementos.editarId.value,
+                    data: elementos.editarData.value,
+                    entrada: elementos.editarEntrada.value,
+                    saida: elementos.editarSaida.value,
+                    intervaloSaida: elementos.editarIntervaloSaida.value,
+                    intervaloRetorno: elementos.editarIntervaloRetorno.value,
+                    observacoes: elementos.editarObservacoes.value
+                };
+                
+                stateManager.salvarEdicaoRegistro(dados);
+                elementos.editarModal.classList.add('hidden');
+            });
+            
+            elementos.cancelarEdicao.addEventListener('click', () => {
+                elementos.editarModal.classList.add('hidden');
+            });
+            
+            // Admin
+            elementos.changeAdminPassword.addEventListener('click', () => {
+                const senhaAtual = elementos.currentPassword.value;
+                const novaSenha = elementos.newPassword.value;
+                const confirmacao = elementos.confirmNewPassword.value;
+                
+                if (!senhaAtual || !novaSenha || !confirmacao) {
+                    utils.mostrarToast('Preencha todos os campos!', 'error');
+                    return;
+                }
+                
+                const resultado = auth.alterarSenhaAdmin(senhaAtual, novaSenha, confirmacao);
+                
+                if (resultado.sucesso) {
+                    utils.mostrarToast(resultado.mensagem);
+                    elementos.currentPassword.value = '';
+                    elementos.newPassword.value = '';
+                    elementos.confirmNewPassword.value = '';
+                } else {
+                    utils.mostrarToast(resultado.mensagem, 'error');
+                }
+            });
+            
+            elementos.createUserBtn.addEventListener('click', () => {
+                const usuario = elementos.newUsername.value.trim();
+                const senha = elementos.newUserPassword.value;
+                const confirmacao = elementos.confirmNewUserPassword.value;
+                
+                if (!usuario || !senha || !confirmacao) {
+                    utils.mostrarToast('Preencha todos os campos!', 'error');
+                    return;
+                }
+                
+                const resultado = auth.criarUsuario(usuario, senha, confirmacao);
+                
+                if (resultado.sucesso) {
+                    utils.mostrarToast(resultado.mensagem);
+                    elementos.newUsername.value = '';
+                    elementos.newUserPassword.value = '';
+                    elementos.confirmNewUserPassword.value = '';
+                    auth.carregarListaUsuarios();
+                } else {
+                    utils.mostrarToast(resultado.mensagem, 'error');
+                }
+            });
+            
+            // Carregar dados iniciais
+            stateManager.carregarEstado();
+        };
+
+        // Inicializar a aplicação quando o DOM estiver carregado
+        document.addEventListener('DOMContentLoaded', init);
     </script>
 </body>
 </html>
