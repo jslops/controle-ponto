@@ -285,6 +285,14 @@
             background-color: rgba(139, 92, 246, 0.1);
             color: var(--accent);
         }
+
+        /* Período personalizado */
+        .periodo-config {
+            background: linear-gradient(145deg, #f0f9ff, #e0f2fe);
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 20px;
+        }
     </style>
 </head>
 <body class="bg-gray-50">
@@ -477,7 +485,7 @@
                         <i class="fas fa-clock text-blue-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Horas Este Mês</p>
+                        <p class="text-sm text-gray-600">Horas Este Período</p>
                         <p class="text-2xl font-bold text-gray-800" id="dashboardHorasMes">00:00</p>
                     </div>
                 </div>
@@ -489,7 +497,7 @@
                         <i class="fas fa-money-bill-wave text-green-600 text-xl"></i>
                     </div>
                     <div>
-                        <p class="text-sm text-gray-600">Salário Este Mês</p>
+                        <p class="text-sm text-gray-600">Salário Este Período</p>
                         <p class="text-2xl font-bold text-gray-800" id="dashboardSalarioMes">R$ 0,00</p>
                     </div>
                 </div>
@@ -520,6 +528,30 @@
             </div>
         </div>
 
+        <!-- Configuração do Período Personalizado -->
+        <div class="periodo-config mb-6 no-print">
+            <h2 class="text-xl font-bold mb-4">📅 Configuração do Período</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-4">
+                <div>
+                    <label for="periodoInicio" class="block text-sm font-medium text-gray-700 mb-1">Dia de Início do Período:</label>
+                    <input type="number" id="periodoInicio" class="modern-input" min="1" max="31" value="16">
+                </div>
+                <div>
+                    <label for="periodoFim" class="block text-sm font-medium text-gray-700 mb-1">Dia de Fim do Período:</label>
+                    <input type="number" id="periodoFim" class="modern-input" min="1" max="31" value="15">
+                </div>
+                <div class="flex items-end">
+                    <button id="salvarPeriodo" class="btn-primary w-full">
+                        <i class="fas fa-save"></i> Salvar Período
+                    </button>
+                </div>
+            </div>
+            <div class="text-sm text-gray-600">
+                <p><strong>Período Atual:</strong> <span id="periodoAtualInfo">16/10/2023 a 15/11/2023</span></p>
+                <p class="mt-1">Exemplo: Se configurado como 16 a 15, o período será do dia 16 de um mês ao dia 15 do mês seguinte.</p>
+            </div>
+        </div>
+
         <!-- Controle de modo de trabalho -->
         <div class="mb-6 no-print">
             <div class="modern-card">
@@ -537,16 +569,16 @@
                 <div id="mensalistaConfig" class="hidden">
                     <div class="grid grid-cols-1 md:grid-cols-2 gap-4 mb-4">
                         <div>
-                            <label for="cargaHorariaMensal" class="block text-sm font-medium text-gray-700 mb-1">Carga Horária Mensal (horas):</label>
+                            <label for="cargaHorariaMensal" class="block text-sm font-medium text-gray-700 mb-1">Carga Horária do Período (horas):</label>
                             <input type="number" id="cargaHorariaMensal" class="modern-input" min="0" value="160">
                         </div>
                         <div>
-                            <label for="salarioMensal" class="block text-sm font-medium text-gray-700 mb-1">Salário Mensal (R$):</label>
+                            <label for="salarioMensal" class="block text-sm font-medium text-gray-700 mb-1">Salário do Período (R$):</label>
                             <input type="number" id="salarioMensal" class="modern-input" min="0" step="0.01" value="3000.00">
                         </div>
                     </div>
                     <div class="bg-blue-50 rounded-lg p-4">
-                        <h3 class="font-medium text-blue-800 mb-2">Status do Mês</h3>
+                        <h3 class="font-medium text-blue-800 mb-2">Status do Período</h3>
                         <div class="flex justify-between">
                             <span>Horas Trabalhadas:</span>
                             <span id="horasTrabalhadasMensal">00:00</span>
@@ -564,27 +596,27 @@
             </div>
         </div>
 
-        <!-- Abas dos meses -->
+        <!-- Abas dos períodos -->
         <div class="mb-6 no-print">
             <div class="flex flex-wrap gap-2">
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="0">Jan</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="1">Fev</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="2">Mar</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="3">Abr</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="4">Mai</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="5">Jun</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="6">Jul</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="7">Ago</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="8">Set</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="9">Out</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="10">Nov</button>
-                <button class="month-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-month="11">Dez</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="0">Out/Nov</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="1">Nov/Dez</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="2">Dez/Jan</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="3">Jan/Fev</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="4">Fev/Mar</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="5">Mar/Abr</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="6">Abr/Mai</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="7">Mai/Jun</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="8">Jun/Jul</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="9">Jul/Ago</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="10">Ago/Set</button>
+                <button class="period-tab px-4 py-2 rounded-lg bg-white border border-gray-300 hover:bg-gray-100" data-period="11">Set/Out</button>
             </div>
         </div>
 
         <!-- Ano selecionado -->
         <div class="mb-6 no-print">
-            <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Ano:</label>
+            <label for="yearSelect" class="block text-sm font-medium text-gray-700 mb-1">Ano de Referência:</label>
             <select id="yearSelect" class="modern-input w-32">
                 <!-- Opções de ano serão preenchidas via JavaScript -->
             </select>
@@ -714,7 +746,7 @@
 
             <!-- Resumo e gráficos -->
             <div class="modern-card">
-                <h2 class="text-xl font-bold mb-4">📈 Resumo do Mês</h2>
+                <h2 class="text-xl font-bold mb-4">📈 Resumo do Período</h2>
                 
                 <div class="grid grid-cols-2 gap-4 mb-6">
                     <div class="bg-blue-50 rounded-lg p-4">
@@ -749,7 +781,7 @@
         <!-- Lista de registros -->
         <div class="modern-card mt-8">
             <div class="flex justify-between items-center mb-4">
-                <h2 class="text-xl font-bold">📋 Registros do Mês</h2>
+                <h2 class="text-xl font-bold">📋 Registros do Período</h2>
                 <div class="text-sm text-gray-600">
                     <span id="totalRegistros">0</span> registros
                 </div>
@@ -887,11 +919,15 @@
         // =============================================
         let currentUser = null;
         let usersData = {};
-        let currentMonth = new Date().getMonth();
+        let currentPeriod = 0; // Índice do período atual (0-11)
         let currentYear = new Date().getFullYear();
         let registros = [];
         let workMode = 'horista'; // 'horista' ou 'mensalista'
         let jsonBinConfig = { ...DEFAULT_JSONBIN_CONFIG };
+        let periodoConfig = {
+            inicio: 16,
+            fim: 15
+        };
 
         // =============================================
         // INICIALIZAÇÃO
@@ -919,7 +955,7 @@
             // Configurar eventos
             setupEventListeners();
             initializeYearSelect();
-            updateMonthTabs();
+            updatePeriodTabs();
             loadMensalistaConfig();
         });
 
@@ -951,8 +987,8 @@
             // Navegação
             document.getElementById('yearSelect').addEventListener('change', function() {
                 currentYear = parseInt(this.value);
-                updateMonthTabs();
-                carregarRegistrosMes();
+                updatePeriodTabs();
+                carregarRegistrosPeriodo();
             });
             
             // Impressão
@@ -995,6 +1031,84 @@
             // Admin
             document.getElementById('changeAdminPassword').addEventListener('click', changeAdminPassword);
             document.getElementById('createUserBtn').addEventListener('click', createUser);
+            
+            // Configuração do período
+            document.getElementById('salvarPeriodo').addEventListener('click', salvarConfiguracaoPeriodo);
+        }
+
+        // =============================================
+        // FUNÇÕES DE PERÍODO PERSONALIZADO
+        // =============================================
+        function getPeriodoDates(periodIndex, year) {
+            // Mapeamento dos períodos (0-11)
+            const periodos = [
+                { inicioMes: 9, fimMes: 10, nome: 'Out/Nov' },    // Out/Nov (16/out a 15/nov)
+                { inicioMes: 10, fimMes: 11, nome: 'Nov/Dez' },   // Nov/Dez (16/nov a 15/dez)
+                { inicioMes: 11, fimMes: 0, nome: 'Dez/Jan' },    // Dez/Jan (16/dez a 15/jan)
+                { inicioMes: 0, fimMes: 1, nome: 'Jan/Fev' },     // Jan/Fev (16/jan a 15/fev)
+                { inicioMes: 1, fimMes: 2, nome: 'Fev/Mar' },     // Fev/Mar (16/fev a 15/mar)
+                { inicioMes: 2, fimMes: 3, nome: 'Mar/Abr' },     // Mar/Abr (16/mar a 15/abr)
+                { inicioMes: 3, fimMes: 4, nome: 'Abr/Mai' },     // Abr/Mai (16/abr a 15/mai)
+                { inicioMes: 4, fimMes: 5, nome: 'Mai/Jun' },     // Mai/Jun (16/mai a 15/jun)
+                { inicioMes: 5, fimMes: 6, nome: 'Jun/Jul' },     // Jun/Jul (16/jun a 15/jul)
+                { inicioMes: 6, fimMes: 7, nome: 'Jul/Ago' },     // Jul/Ago (16/jul a 15/ago)
+                { inicioMes: 7, fimMes: 8, nome: 'Ago/Set' },     // Ago/Set (16/ago a 15/set)
+                { inicioMes: 8, fimMes: 9, nome: 'Set/Out' }      // Set/Out (16/set a 15/out)
+            ];
+
+            const periodo = periodos[periodIndex];
+            let inicioYear = year;
+            let fimYear = year;
+
+            // Ajustar anos para períodos que cruzam o ano
+            if (periodo.fimMes < periodo.inicioMes) {
+                fimYear = year + 1;
+            }
+
+            const dataInicio = new Date(inicioYear, periodo.inicioMes, periodoConfig.inicio);
+            const dataFim = new Date(fimYear, periodo.fimMes, periodoConfig.fim);
+
+            return {
+                dataInicio,
+                dataFim,
+                nome: periodo.nome
+            };
+        }
+
+        function isDataNoPeriodo(data, periodoIndex, year) {
+            const periodo = getPeriodoDates(periodoIndex, year);
+            const dataReg = new Date(data + 'T00:00:00');
+            return dataReg >= periodo.dataInicio && dataReg <= periodo.dataFim;
+        }
+
+        function salvarConfiguracaoPeriodo() {
+            const inicio = parseInt(document.getElementById('periodoInicio').value);
+            const fim = parseInt(document.getElementById('periodoFim').value);
+
+            if (inicio < 1 || inicio > 31 || fim < 1 || fim > 31) {
+                showToast('Os dias devem estar entre 1 e 31', 'error');
+                return;
+            }
+
+            periodoConfig.inicio = inicio;
+            periodoConfig.fim = fim;
+
+            // Salvar no localStorage
+            if (currentUser && currentUser.username !== 'admin') {
+                usersData[currentUser.username].periodoConfig = periodoConfig;
+                saveUserData();
+            }
+
+            updatePeriodInfo();
+            carregarRegistrosPeriodo();
+            showToast('Configuração do período salva com sucesso!', 'success');
+        }
+
+        function updatePeriodInfo() {
+            const periodo = getPeriodoDates(currentPeriod, currentYear);
+            const inicioFormatado = periodo.dataInicio.toLocaleDateString('pt-BR');
+            const fimFormatado = periodo.dataFim.toLocaleDateString('pt-BR');
+            document.getElementById('periodoAtualInfo').textContent = `${inicioFormatado} a ${fimFormatado}`;
         }
 
         // =============================================
@@ -1091,6 +1205,10 @@
                         mensalistaConfig: {
                             cargaHorariaMensal: 160,
                             salarioMensal: 3000.00
+                        },
+                        periodoConfig: {
+                            inicio: 16,
+                            fim: 15
                         }
                     },
                     descontos: []
@@ -1140,7 +1258,7 @@
             // Atualizar interface do usuário
             document.getElementById('userWelcome').textContent = currentUser.username;
             updateWorkModeUI();
-            carregarRegistrosMes();
+            carregarRegistrosPeriodo();
             atualizarDashboard();
         }
 
@@ -1280,6 +1398,13 @@
                         document.getElementById('valorHoraExtra').value = userData.settings.valorHoraExtra || 50;
                         workMode = userData.settings.workMode || 'horista';
                         
+                        // Carregar configuração do período
+                        if (userData.settings.periodoConfig) {
+                            periodoConfig = userData.settings.periodoConfig;
+                            document.getElementById('periodoInicio').value = periodoConfig.inicio;
+                            document.getElementById('periodoFim').value = periodoConfig.fim;
+                        }
+                        
                         // Atualizar modo de trabalho na UI
                         document.querySelectorAll('.modern-tab').forEach(tab => {
                             tab.classList.remove('active');
@@ -1303,6 +1428,7 @@
                     }
                     
                     showAppScreen();
+                    updatePeriodInfo();
                 } else {
                     showToast('Erro ao carregar dados do usuário', 'error');
                 }
@@ -1325,6 +1451,7 @@
                         valorHoraAula: parseFloat(document.getElementById('valorHoraAula').value),
                         valorHoraExtra: parseInt(document.getElementById('valorHoraExtra').value),
                         workMode: workMode,
+                        periodoConfig: periodoConfig,
                         mensalistaConfig: {
                             cargaHorariaMensal: parseInt(document.getElementById('cargaHorariaMensal').value),
                             salarioMensal: parseFloat(document.getElementById('salarioMensal').value)
@@ -1347,17 +1474,21 @@
         async function handlePontoSubmit(e) {
             e.preventDefault();
             
-            const data = document.getElementById('data').value;
+            const dataInput = document.getElementById('data').value;
             const entrada = document.getElementById('entrada').value;
             const saida = document.getElementById('saida').value;
             const intervaloSaida = document.getElementById('intervaloSaida').value;
             const intervaloRetorno = document.getElementById('intervaloRetorno').value;
             const observacoes = document.getElementById('observacoes').value;
             
-            if (!data || !entrada || !saida) {
+            if (!dataInput || !entrada || !saida) {
                 showToast('Preencha pelo menos data, entrada e saída', 'error');
                 return;
             }
+            
+            // CORREÇÃO: Garantir que a data seja tratada corretamente
+            // Usando a data diretamente do input sem conversão para evitar problemas de fuso horário
+            const data = dataInput;
             
             // Coletar horários adicionais
             const horariosAdicionais = [];
@@ -1393,7 +1524,7 @@
             await saveUserData();
             
             // Atualizar interface
-            carregarRegistrosMes();
+            carregarRegistrosPeriodo();
             atualizarDashboard();
             limparFormulario();
             
@@ -1430,32 +1561,30 @@
             return toTimeString(totalMinutes);
         }
 
-        function carregarRegistrosMes() {
+        function carregarRegistrosPeriodo() {
             const tabela = document.getElementById('registrosTabela');
             tabela.innerHTML = '';
             
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
+            const registrosPeriodo = registros.filter(reg => {
+                return isDataNoPeriodo(reg.data, currentPeriod, currentYear);
             });
             
             // Ordenar por data (mais recente primeiro)
-            registrosMes.sort((a, b) => new Date(b.data) - new Date(a.data));
+            registrosPeriodo.sort((a, b) => new Date(b.data) - new Date(a.data));
             
-            document.getElementById('totalRegistros').textContent = registrosMes.length;
+            document.getElementById('totalRegistros').textContent = registrosPeriodo.length;
             
-            if (registrosMes.length === 0) {
-                tabela.innerHTML = '<tr><td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">Nenhum registro encontrado para este mês</td></tr>';
+            if (registrosPeriodo.length === 0) {
+                tabela.innerHTML = '<tr><td colspan="7" class="border border-gray-300 px-4 py-2 text-center text-gray-500">Nenhum registro encontrado para este período</td></tr>';
                 return;
             }
             
-            registrosMes.forEach(registro => {
+            registrosPeriodo.forEach(registro => {
                 const tr = document.createElement('tr');
                 tr.className = 'time-entry';
                 
-                // Formatar data
-                const dataObj = new Date(registro.data);
-                const dataFormatada = dataObj.toLocaleDateString('pt-BR');
+                // Formatar data - CORREÇÃO: Usar a data original do registro
+                const dataFormatada = formatarData(registro.data);
                 
                 // Calcular horas extras (se aplicável)
                 const horasExtras = calcularHorasExtras(registro.totalHoras);
@@ -1500,6 +1629,12 @@
             atualizarCalculos();
         }
 
+        // CORREÇÃO: Função para formatar data corretamente
+        function formatarData(dataString) {
+            const data = new Date(dataString + 'T00:00:00'); // Adicionar horário para evitar problemas de fuso
+            return data.toLocaleDateString('pt-BR');
+        }
+
         function calcularHorasExtras(totalHoras) {
             // Considerar 8 horas como jornada padrão
             const [horas, minutos] = totalHoras.split(':').map(Number);
@@ -1539,17 +1674,21 @@
             e.preventDefault();
             
             const id = parseInt(document.getElementById('editId').value);
-            const data = document.getElementById('editData').value;
+            const dataInput = document.getElementById('editData').value;
             const entrada = document.getElementById('editEntrada').value;
             const saida = document.getElementById('editSaida').value;
             const intervaloSaida = document.getElementById('editIntervaloSaida').value;
             const intervaloRetorno = document.getElementById('editIntervaloRetorno').value;
             const observacoes = document.getElementById('editObservacoes').value;
             
-            if (!data || !entrada || !saida) {
+            if (!dataInput || !entrada || !saida) {
                 showToast('Preencha pelo menos data, entrada e saída', 'error');
                 return;
             }
+            
+            // CORREÇÃO: Garantir que a data seja tratada corretamente
+            // Usando a data diretamente do input sem conversão para evitar problemas de fuso horário
+            const data = dataInput;
             
             // Encontrar e atualizar registro
             const index = registros.findIndex(r => r.id === id);
@@ -1574,7 +1713,7 @@
             await saveUserData();
             
             // Atualizar interface
-            carregarRegistrosMes();
+            carregarRegistrosPeriodo();
             atualizarDashboard();
             fecharModalEdicao();
             
@@ -1592,7 +1731,7 @@
             await saveUserData();
             
             // Atualizar interface
-            carregarRegistrosMes();
+            carregarRegistrosPeriodo();
             atualizarDashboard();
             
             showToast('Registro excluído com sucesso!', 'success');
@@ -1632,9 +1771,8 @@
         }
 
         function atualizarCalculosHorista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
+            const registrosPeriodo = registros.filter(reg => {
+                return isDataNoPeriodo(reg.data, currentPeriod, currentYear);
             });
             
             // Calcular totais
@@ -1643,7 +1781,7 @@
             let totalHorasExtras = 0;
             let totalMinutosExtras = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1696,27 +1834,28 @@
             document.getElementById('dashboardHorasExtras').textContent = totalHorasExtrasFormatado;
             
             // Calcular média semanal
-            const semanasNoMes = Math.ceil(registrosMes.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoMes > 0 ? totalHoras / semanasNoMes : 0;
+            const periodo = getPeriodoDates(currentPeriod, currentYear);
+            const diasNoPeriodo = Math.ceil((periodo.dataFim - periodo.dataInicio) / (1000 * 60 * 60 * 24)) + 1;
+            const semanasNoPeriodo = Math.ceil(diasNoPeriodo / 7);
+            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
             const mediaHoras = Math.floor(mediaSemanalHoras);
             const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
             document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
             
             // Atualizar gráficos
-            atualizarGraficos(registrosMes);
+            atualizarGraficos(registrosPeriodo);
         }
 
         function atualizarCalculosMensalista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
+            const registrosPeriodo = registros.filter(reg => {
+                return isDataNoPeriodo(reg.data, currentPeriod, currentYear);
             });
             
             // Calcular totais
             let totalHoras = 0;
             let totalMinutos = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1789,14 +1928,16 @@
             document.getElementById('dashboardHorasExtras').textContent = diferencaMinutos > 0 ? `+${diferencaFormatada}` : '00:00';
             
             // Calcular média semanal
-            const semanasNoMes = Math.ceil(registrosMes.length / 5); // Aproximação
-            const mediaSemanalHoras = semanasNoMes > 0 ? totalHoras / semanasNoMes : 0;
+            const periodo = getPeriodoDates(currentPeriod, currentYear);
+            const diasNoPeriodo = Math.ceil((periodo.dataFim - periodo.dataInicio) / (1000 * 60 * 60 * 24)) + 1;
+            const semanasNoPeriodo = Math.ceil(diasNoPeriodo / 7);
+            const mediaSemanalHoras = semanasNoPeriodo > 0 ? totalHoras / semanasNoPeriodo : 0;
             const mediaHoras = Math.floor(mediaSemanalHoras);
             const mediaMinutos = Math.round((mediaSemanalHoras - mediaHoras) * 60);
             document.getElementById('dashboardMediaSemanal').textContent = `${mediaHoras.toString().padStart(2, '0')}:${mediaMinutos.toString().padStart(2, '0')}`;
             
             // Atualizar gráficos
-            atualizarGraficos(registrosMes);
+            atualizarGraficos(registrosPeriodo);
         }
 
         function calcularSalarioCompleto() {
@@ -1808,9 +1949,8 @@
         }
 
         function calcularSalarioHorista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
+            const registrosPeriodo = registros.filter(reg => {
+                return isDataNoPeriodo(reg.data, currentPeriod, currentYear);
             });
             
             // Calcular totais
@@ -1819,7 +1959,7 @@
             let totalHorasExtras = 0;
             let totalMinutosExtras = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -1903,16 +2043,15 @@
         }
 
         function calcularSalarioMensalista() {
-            const registrosMes = registros.filter(reg => {
-                const dataReg = new Date(reg.data);
-                return dataReg.getMonth() === currentMonth && dataReg.getFullYear() === currentYear;
+            const registrosPeriodo = registros.filter(reg => {
+                return isDataNoPeriodo(reg.data, currentPeriod, currentYear);
             });
             
             // Calcular totais
             let totalHoras = 0;
             let totalMinutos = 0;
             
-            registrosMes.forEach(reg => {
+            registrosPeriodo.forEach(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 totalHoras += horas;
                 totalMinutos += minutos;
@@ -2088,25 +2227,25 @@
         }
 
         // =============================================
-        // FUNÇões DE GRÁFICOS
+        // FUNÇÕES DE GRÁFICOS
         // =============================================
-        function atualizarGraficos(registrosMes) {
-            atualizarGraficoHorasSemanais(registrosMes);
-            atualizarGraficoHorasDiarias(registrosMes);
+        function atualizarGraficos(registrosPeriodo) {
+            atualizarGraficoHorasSemanais(registrosPeriodo);
+            atualizarGraficoHorasDiarias(registrosPeriodo);
         }
 
-        function atualizarGraficoHorasSemanais(registrosMes) {
+        function atualizarGraficoHorasSemanais(registrosPeriodo) {
             const ctx = document.getElementById('horasSemanaisChart').getContext('2d');
             
             // Agrupar por semana
             const semanas = {};
-            registrosMes.forEach(reg => {
-                const data = new Date(reg.data);
-                // Obter número da semana no mês
-                const firstDay = new Date(data.getFullYear(), data.getMonth(), 1);
-                const firstDayWeekday = firstDay.getDay();
-                const offsetDate = data.getDate() + firstDayWeekday - 1;
-                const semana = Math.floor(offsetDate / 7) + 1;
+            registrosPeriodo.forEach(reg => {
+                const data = new Date(reg.data + 'T00:00:00');
+                // Obter número da semana no período
+                const periodo = getPeriodoDates(currentPeriod, currentYear);
+                const diffTime = Math.abs(data - periodo.dataInicio);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const semana = Math.floor(diffDays / 7) + 1;
                 
                 if (!semanas[semana]) {
                     semanas[semana] = 0;
@@ -2153,19 +2292,19 @@
             });
         }
 
-        function atualizarGraficoHorasDiarias(registrosMes) {
+        function atualizarGraficoHorasDiarias(registrosPeriodo) {
             const ctx = document.getElementById('horasDiariasChart').getContext('2d');
             
             // Ordenar registros por data
-            registrosMes.sort((a, b) => new Date(a.data) - new Date(b.data));
+            registrosPeriodo.sort((a, b) => new Date(a.data) - new Date(b.data));
             
             // Preparar dados para o gráfico
-            const labels = registrosMes.map(reg => {
-                const data = new Date(reg.data);
+            const labels = registrosPeriodo.map(reg => {
+                const data = new Date(reg.data + 'T00:00:00');
                 return data.getDate().toString().padStart(2, '0') + '/' + (data.getMonth() + 1).toString().padStart(2, '0');
             });
             
-            const data = registrosMes.map(reg => {
+            const data = registrosPeriodo.map(reg => {
                 const [horas, minutos] = reg.totalHoras.split(':').map(Number);
                 return horas + (minutos / 60);
             });
@@ -2232,18 +2371,19 @@
             }
         }
 
-        function updateMonthTabs() {
-            document.querySelectorAll('.month-tab').forEach(tab => {
+        function updatePeriodTabs() {
+            document.querySelectorAll('.period-tab').forEach(tab => {
                 tab.classList.remove('tab-active', 'bg-blue-100', 'text-blue-800');
                 
-                if (parseInt(tab.dataset.month) === currentMonth) {
+                if (parseInt(tab.dataset.period) === currentPeriod) {
                     tab.classList.add('tab-active', 'bg-blue-100', 'text-blue-800');
                 }
                 
                 tab.addEventListener('click', function() {
-                    currentMonth = parseInt(this.dataset.month);
-                    updateMonthTabs();
-                    carregarRegistrosMes();
+                    currentPeriod = parseInt(this.dataset.period);
+                    updatePeriodTabs();
+                    updatePeriodInfo();
+                    carregarRegistrosPeriodo();
                 });
             });
         }
@@ -2397,6 +2537,10 @@
                     valorHoraAula: 50.00,
                     valorHoraExtra: 50,
                     workMode: 'horista',
+                    periodoConfig: {
+                        inicio: 16,
+                        fim: 15
+                    },
                     mensalistaConfig: {
                         cargaHorariaMensal: 160,
                         salarioMensal: 3000.00
@@ -2507,7 +2651,7 @@
                         saveUserData();
                         
                         // Atualizar interface
-                        carregarRegistrosMes();
+                        carregarRegistrosPeriodo();
                         atualizarDashboard();
                         
                         showToast('Dados importados com sucesso!', 'success');
